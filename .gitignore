@@ -16,5 +16,21 @@ backend/uploads/
 # Build del frontend
 frontend/dist/
 
+# SQLite (BD migrada a Supabase)
+backend/prisma/dev.db
+
+# Archivos con credenciales
+NOSOTROS.md
+
+# Docs generados automáticamente
+doc/
+doc-filelist.js
+doc-script.js
+doc-style.css
+
+# Supabase JS SDK instalado en raíz por error (no se usa en este proyecto)
+package.json
+package-lock.json
+
 # OS
 .DS_Store

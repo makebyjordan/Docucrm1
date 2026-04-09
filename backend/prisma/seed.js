@@ -353,7 +353,7 @@ async function main() {
     await prisma.emailTemplate.upsert({
       where: { id: 'seed-' + emailTpl.type },
       update: { subject: emailTpl.subject, bodyHtml: emailTpl.bodyHtml },
-      create: { id: 'seed-' + emailTpl.type, ...emailTpl, variables: JSON.stringify(emailTpl.variables) },
+      create: { id: 'seed-' + emailTpl.type, ...emailTpl },
     });
     console.log(`  ✓ Email template: ${emailTpl.name}`);
   }
