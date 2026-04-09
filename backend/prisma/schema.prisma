@@ -1,0 +1,299 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// SQLite: enums → String, Decimal → Float, String[] → String (JSON), Json → String
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   // COMERCIAL | FIRMAS | MARKETING | DIRECCION | ADMINISTRACION
+  phone     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignments       ExpedientAssignment[]
+  uploadedDocuments Document[]
+  notifications     Notification[]
+  phaseChanges      PhaseHistory[]
+
+  @@map("users")
+}
+
+model Client {
+  id            String    @id @default(cuid())
+  type          String    // INQUILINO | PROPIETARIO | COMPRADOR | VENDEDOR | INVERSOR | EMPRESA
+  firstName     String?
+  lastName      String?
+  dni           String?
+  companyName   String?
+  nif           String?
+  contactPerson String?
+  email         String
+  phone         String
+  phone2        String?
+  address       String?
+  city          String?
+  postalCode    String?
+  province      String?
+  privacyPolicy Boolean   @default(false)
+  privacyDate   DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  expedients Expedient[]
+
+  @@map("clients")
+}
+
+model Expedient {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  clientId      String
+  operationType String   // ALQUILER | VENTA | COMPRA | INVERSION | PROMOCION | EDIFICIO | RESORT
+  operationSize String   @default("INDIVIDUAL")
+  currentPhase  String   @default("CAPTACION")
+  status        String   @default("ACTIVO")
+
+  propertyAddress String?
+  propertyCity    String?
+  propertyRef     String?
+  propertyPrice   Float?
+  propertyM2      Float?
+  propertyRooms   Int?
+  propertyBaths   Int?
+
+  driveFolder   String?
+  driveFolderId String?
+
+  exclusivityStart  DateTime?
+  exclusivityMonths Int?      @default(3)
+  exclusivityEnd    DateTime?
+
+  openedAt      DateTime  @default(now())
+  closedAt      DateTime?
+  postventa3At  DateTime?
+  postventa6At  DateTime?
+  postventa12At DateTime?
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client        Client                @relation(fields: [clientId], references: [id])
+  assignments   ExpedientAssignment[]
+  checklists    ChecklistInstance[]
+  documents     Document[]
+  signatures    Signature[]
+  notifications Notification[]
+  phaseHistory  PhaseHistory[]
+  buyers        Buyer[]
+
+  @@map("expedients")
+}
+
+model ExpedientAssignment {
+  id          String   @id @default(cuid())
+  expedientId String
+  userId      String
+  role        String
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  expedient Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([expedientId, role, userId])
+  @@map("expedient_assignments")
+}
+
+model PhaseHistory {
+  id          String    @id @default(cuid())
+  expedientId String
+  fromPhase   String?
+  toPhase     String
+  changedById String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+
+  expedient Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+  changedBy User?     @relation(fields: [changedById], references: [id])
+
+  @@map("phase_history")
+}
+
+model Buyer {
+  id          String   @id @default(cuid())
+  expedientId String
+  name        String
+  email       String
+  phone       String
+  offer       Float?
+  notes       String?
+  accepted    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  expedient Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+
+  @@map("buyers")
+}
+
+model ChecklistTemplate {
+  id            String    @id @default(cuid())
+  name          String
+  operationType String
+  operationSize String    @default("INDIVIDUAL")
+  clientType    String?
+  phase         String
+  description   String?
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  items     ChecklistTemplateItem[]
+  instances ChecklistInstance[]
+
+  @@map("checklist_templates")
+}
+
+model ChecklistTemplateItem {
+  id          String  @id @default(cuid())
+  templateId  String
+  label       String
+  description String?
+  required    Boolean @default(true)
+  order       Int
+
+  template ChecklistTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_template_items")
+}
+
+model ChecklistInstance {
+  id          String    @id @default(cuid())
+  expedientId String
+  templateId  String
+  phase       String
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  expedient Expedient         @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+  template  ChecklistTemplate @relation(fields: [templateId], references: [id])
+  items     ChecklistInstanceItem[]
+
+  @@map("checklist_instances")
+}
+
+model ChecklistInstanceItem {
+  id          String    @id @default(cuid())
+  instanceId  String
+  label       String
+  description String?
+  required    Boolean   @default(true)
+  completed   Boolean   @default(false)
+  notes       String?
+  completedAt DateTime?
+  completedBy String?
+  order       Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  instance ChecklistInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_instance_items")
+}
+
+model Document {
+  id             String    @id @default(cuid())
+  expedientId    String
+  uploadedById   String?
+  name           String
+  docType        String
+  phase          String
+  status         String    @default("PENDIENTE")
+  driveFileId    String?
+  driveUrl       String?
+  filePath       String?
+  fileSize       Int?
+  mimeType       String?
+  notes          String?
+  rejectedReason String?
+  validatedAt    DateTime?
+  version        Int       @default(1)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  expedient  Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+  uploadedBy User?     @relation(fields: [uploadedById], references: [id])
+
+  @@map("documents")
+}
+
+model Signature {
+  id           String    @id @default(cuid())
+  expedientId  String
+  documentName String
+  signerName   String
+  signerEmail  String
+  signerRole   String
+  status       String    @default("PENDIENTE")
+  externalId   String?
+  signUrl      String?
+  signedAt     DateTime?
+  expiresAt    DateTime?
+  reminderSent Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  expedient Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+
+  @@map("signatures")
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  type      String
+  subject   String
+  bodyHtml  String
+  bodyText  String?
+  variables String   @default("[]") // JSON array as string
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("email_templates")
+}
+
+model Notification {
+  id           String    @id @default(cuid())
+  expedientId  String?
+  userId       String?
+  type         String
+  status       String    @default("PENDIENTE")
+  toEmail      String
+  toName       String?
+  subject      String
+  bodyHtml     String
+  scheduledFor DateTime?
+  sentAt       DateTime?
+  errorMessage String?
+  retries      Int       @default(0)
+  metadata     String?   // JSON as string
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  expedient Expedient? @relation(fields: [expedientId], references: [id], onDelete: SetNull)
+  user      User?      @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}

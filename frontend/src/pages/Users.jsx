@@ -1,0 +1,142 @@
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { Plus, Edit2, X, UserCheck, UserX } from 'lucide-react'
+import api from '../api/client'
+
+const ROLE_COLORS = {
+  COMERCIAL: 'bg-blue-100 text-blue-700',
+  FIRMAS: 'bg-green-100 text-green-700',
+  MARKETING: 'bg-purple-100 text-purple-700',
+  DIRECCION: 'bg-orange-100 text-orange-700',
+  ADMINISTRACION: 'bg-gray-100 text-gray-700',
+}
+
+export default function UsersPage() {
+  const qc = useQueryClient()
+  const [modal, setModal] = useState(null)
+
+  const { data: users, isLoading } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => api.get('/users').then(r => r.data),
+  })
+
+  const toggleMutation = useMutation({
+    mutationFn: (user) => api.put(`/users/${user.id}`, { active: !user.active }),
+    onSuccess: () => { toast.success('Usuario actualizado'); qc.invalidateQueries(['users']) },
+  })
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <button onClick={() => setModal('create')} className="btn-primary">
+          <Plus size={15} /> Nuevo usuario
+        </button>
+      </div>
+
+      <div className="card overflow-hidden">
+        {isLoading ? <div className="text-center text-gray-400 py-10">Cargando...</div> : (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                {['Nombre', 'Email', 'Rol', 'Teléfono', 'Estado', ''].map(h => (
+                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {(users || []).map(u => (
+                <tr key={u.id} className={`hover:bg-gray-50 ${!u.active ? 'opacity-50' : ''}`}>
+                  <td className="px-4 py-3 font-medium">{u.name}</td>
+                  <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                  <td className="px-4 py-3">
+                    <span className={`badge ${ROLE_COLORS[u.role] || 'bg-gray-100'}`}>{u.role}</span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">{u.phone || '—'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`badge ${u.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      {u.active ? 'Activo' : 'Inactivo'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => setModal(u)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded">
+                        <Edit2 size={15} />
+                      </button>
+                      <button onClick={() => toggleMutation.mutate(u)} className="p-1.5 text-gray-400 hover:text-orange-500 rounded"
+                        title={u.active ? 'Desactivar' : 'Activar'}>
+                        {u.active ? <UserX size={15} /> : <UserCheck size={15} />}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {modal && (
+        <UserModal
+          user={modal === 'create' ? null : modal}
+          onClose={() => setModal(null)}
+          onSaved={() => { qc.invalidateQueries(['users']); setModal(null) }}
+        />
+      )}
+    </div>
+  )
+}
+
+function UserModal({ user, onClose, onSaved }) {
+  const { register, handleSubmit } = useForm({ defaultValues: user || {} })
+
+  const mutation = useMutation({
+    mutationFn: (data) => user ? api.put(`/users/${user.id}`, data) : api.post('/users', data),
+    onSuccess: () => { toast.success(user ? 'Usuario actualizado' : 'Usuario creado'); onSaved() },
+    onError: (err) => toast.error(err.response?.data?.error || 'Error'),
+  })
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="card p-6 w-full max-w-md">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="font-bold text-lg">{user ? 'Editar usuario' : 'Nuevo usuario'}</h3>
+          <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
+        </div>
+        <form onSubmit={handleSubmit(d => mutation.mutate(d))} className="space-y-4">
+          <div>
+            <label className="label">Nombre completo *</label>
+            <input type="text" className="input" {...register('name', { required: true })} />
+          </div>
+          <div>
+            <label className="label">Email *</label>
+            <input type="email" className="input" {...register('email', { required: true })} />
+          </div>
+          <div>
+            <label className="label">Contraseña {user ? '(dejar en blanco para no cambiar)' : '*'}</label>
+            <input type="password" className="input" {...register('password', { required: !user })} />
+          </div>
+          <div>
+            <label className="label">Rol *</label>
+            <select className="select" {...register('role', { required: true })}>
+              {['COMERCIAL', 'FIRMAS', 'MARKETING', 'DIRECCION', 'ADMINISTRACION'].map(r => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">Teléfono</label>
+            <input type="tel" className="input" {...register('phone')} />
+          </div>
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={onClose} className="btn-secondary">Cancelar</button>
+            <button type="submit" disabled={mutation.isPending} className="btn-primary">
+              {mutation.isPending ? 'Guardando...' : 'Guardar'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
