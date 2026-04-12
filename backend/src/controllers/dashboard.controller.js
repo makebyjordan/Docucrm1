@@ -42,6 +42,7 @@ async function getStats(req, res) {
       byPhase, byType, bySize,
     });
   } catch (err) {
+    console.error('Error en getStats:', err);
     res.status(500).json({ error: err.message });
   }
 }
@@ -77,6 +78,7 @@ async function getAlerts(req, res) {
 
     res.json({ blocked, stale, incompleteChecklists, pendingSignatures });
   } catch (err) {
+    console.error('Error en getAlerts:', err);
     res.status(500).json({ error: err.message });
   }
 }
@@ -106,6 +108,7 @@ async function getRecentActivity(req, res) {
 
     res.json({ recentExpedients, recentPhaseChanges, recentNotifications });
   } catch (err) {
+    console.error('Error en getRecentActivity:', err);
     res.status(500).json({ error: err.message });
   }
 }

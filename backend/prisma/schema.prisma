@@ -74,6 +74,7 @@ enum DocumentStatus {
 
 enum SignatureStatus {
   PENDIENTE
+  ENVIADO
   FIRMADO
   EXPIRADO
 }
