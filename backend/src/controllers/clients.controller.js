@@ -46,15 +46,24 @@ async function getById(req, res) {
   res.json(client);
 }
 
+function normalizeClientData(body) {
+  const { privacyAccepted, ...rest } = body;
+  if (privacyAccepted !== undefined) {
+    rest.privacyPolicy = privacyAccepted;
+    if (privacyAccepted) rest.privacyDate = new Date();
+  }
+  return rest;
+}
+
 async function create(req, res) {
-  const client = await prisma.client.create({ data: req.body });
+  const client = await prisma.client.create({ data: normalizeClientData(req.body) });
   res.status(201).json(client);
 }
 
 async function update(req, res) {
   const client = await prisma.client.update({
     where: { id: req.params.id },
-    data: req.body,
+    data: normalizeClientData(req.body),
   });
   res.json(client);
 }

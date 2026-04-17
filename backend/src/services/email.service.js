@@ -23,10 +23,9 @@ function getTransporter() {
  * @param {Object} opts - { to, subject, html, text, replyTo }
  */
 async function send({ to, subject, html, text, replyTo }) {
-  if (!process.env.SMTP_USER) {
-    logger.warn('[Email] SMTP no configurado. Simulando envío a:', to);
-    logger.info('[Email] Asunto:', subject);
-    return { messageId: 'simulated-' + Date.now() };
+  if (process.env.EMAIL_ENABLED === 'false' || !process.env.SMTP_USER) {
+    logger.debug(`[Email] Desactivado. Se omite envío a: ${to}`);
+    return { messageId: 'disabled-' + Date.now() };
   }
 
   const mailOptions = {

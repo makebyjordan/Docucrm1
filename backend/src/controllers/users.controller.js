@@ -20,13 +20,20 @@ async function getById(req, res) {
 }
 
 async function create(req, res) {
-  const { password, ...data } = req.body;
-  const hashed = await bcrypt.hash(password, 12);
-  const user = await prisma.user.create({
-    data: { ...data, password: hashed },
-    select: { id: true, name: true, email: true, role: true, phone: true, active: true },
-  });
-  res.status(201).json(user);
+  try {
+    const { password, ...data } = req.body;
+    const hashed = await bcrypt.hash(password, 12);
+    const user = await prisma.user.create({
+      data: { ...data, password: hashed },
+      select: { id: true, name: true, email: true, role: true, phone: true, active: true },
+    });
+    res.status(201).json(user);
+  } catch (err) {
+    if (err.code === 'P2002') {
+      return res.status(409).json({ error: 'Ya existe un usuario con ese email' });
+    }
+    throw err;
+  }
 }
 
 async function update(req, res) {

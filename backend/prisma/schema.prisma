@@ -112,6 +112,7 @@ model User {
   uploadedDocuments Document[]
   notifications     Notification[]
   phaseChanges      PhaseHistory[]
+  calendarEvents    CalendarEvent[]
 
   @@map("users")
 }
@@ -138,7 +139,8 @@ model Client {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
-  expedients Expedient[]
+  expedients     Expedient[]
+  calendarEvents CalendarEvent[]
 
   @@map("clients")
 }
@@ -177,14 +179,15 @@ model Expedient {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  client        Client                @relation(fields: [clientId], references: [id])
-  assignments   ExpedientAssignment[]
-  checklists    ChecklistInstance[]
-  documents     Document[]
-  signatures    Signature[]
-  notifications Notification[]
-  phaseHistory  PhaseHistory[]
-  buyers        Buyer[]
+  client         Client                @relation(fields: [clientId], references: [id])
+  assignments    ExpedientAssignment[]
+  checklists     ChecklistInstance[]
+  documents      Document[]
+  signatures     Signature[]
+  notifications  Notification[]
+  phaseHistory   PhaseHistory[]
+  buyers         Buyer[]
+  calendarEvents CalendarEvent[]
 
   @@map("expedients")
 }
@@ -360,6 +363,27 @@ model EmailTemplate {
   updatedAt DateTime         @updatedAt
 
   @@map("email_templates")
+}
+
+model CalendarEvent {
+  id          String   @id @default(cuid())
+  title       String
+  type        String   @default("REUNION")
+  startAt     DateTime
+  endAt       DateTime?
+  allDay      Boolean  @default(false)
+  notes       String?
+  clientId    String?
+  expedientId String?
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  client    Client?    @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  expedient Expedient? @relation(fields: [expedientId], references: [id], onDelete: SetNull)
+  createdBy User?      @relation(fields: [createdById], references: [id])
+
+  @@map("calendar_events")
 }
 
 model Notification {

@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('express-async-errors');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -38,8 +39,8 @@ app.use((err, req, res, next) => {
 // ─── Inicio ───────────────────────────────────────────────────────────────────
 async function main() {
   try {
-    await prisma.$connect();
-    logger.info('Conectado a PostgreSQL');
+    // await prisma.$connect();
+    logger.info('Aviso: Conexión explícita a PostgreSQL desactivada temporalmente en el arranque.');
 
     app.listen(PORT, () => {
       logger.info(`Servidor CRM escuchando en http://localhost:${PORT}`);

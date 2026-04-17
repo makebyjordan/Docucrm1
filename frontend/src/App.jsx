@@ -9,6 +9,7 @@ import NewExpedientPage from './pages/NewExpedient'
 import ClientsPage from './pages/Clients'
 import SettingsPage from './pages/Settings'
 import UsersPage from './pages/Users'
+import CalendarPage from './pages/Calendar'
 
 function PrivateRoute({ children }) {
   const token = useAuthStore(s => s.token)
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="clients" element={<ClientsPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="calendar" element={<CalendarPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

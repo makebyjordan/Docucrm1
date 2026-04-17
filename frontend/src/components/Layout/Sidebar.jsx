@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, FolderKanban, Users, Settings,
-  Building2, UserCog, Bell,
+  Building2, UserCog, CalendarDays,
 } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 
@@ -11,6 +11,10 @@ const navItems = [
   { to: '/clients', icon: Users, label: 'Clientes' },
   { to: '/users', icon: UserCog, label: 'Usuarios', roles: ['DIRECCION', 'ADMINISTRACION'] },
   { to: '/settings', icon: Settings, label: 'Configuración', roles: ['DIRECCION', 'ADMINISTRACION'] },
+]
+
+const bottomItems = [
+  { to: '/calendar', icon: CalendarDays, label: 'Calendario' },
 ]
 
 export default function Sidebar() {
@@ -50,6 +54,26 @@ export default function Sidebar() {
             </NavLink>
           ))}
       </nav>
+
+      {/* Calendario (abajo) */}
+      <div className="px-3 pb-2 border-t border-gray-700 pt-3">
+        {bottomItems.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isActive
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+              }`
+            }
+          >
+            <Icon size={18} />
+            {label}
+          </NavLink>
+        ))}
+      </div>
 
       {/* Usuario */}
       <div className="px-4 py-4 border-t border-gray-700">

@@ -187,6 +187,12 @@ function ClientModal({ client, onClose, onSaved }) {
             <label htmlFor="privacy" className="text-sm text-gray-700">Política de privacidad aceptada</label>
           </div>
 
+          <div>
+            <label className="label">Notas</label>
+            <textarea rows={3} className="input resize-none" placeholder="Observaciones sobre el cliente..."
+              {...register('notes')} />
+          </div>
+
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={onClose} className="btn-secondary">Cancelar</button>
             <button type="submit" disabled={mutation.isPending} className="btn-primary">
