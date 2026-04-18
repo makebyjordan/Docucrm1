@@ -9,7 +9,7 @@ import api from '../api/client'
 export default function NewExpedientPage() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1) // 1: Cliente, 2: Inmueble/Operación, 3: Responsables
-  const { register, handleSubmit, watch, formState: { errors } } = useForm()
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm()
 
   const { data: users } = useQuery({
     queryKey: ['users'],
@@ -95,8 +95,14 @@ export default function NewExpedientPage() {
               <label className="label">Tipo de operación *</label>
               <select className="select" {...register('operationType', { required: true })}>
                 <option value="">Selecciona...</option>
-                {['VENTA', 'ALQUILER', 'COMPRA', 'INVERSION', 'PROMOCION', 'EDIFICIO', 'RESORT'].map(t => (
-                  <option key={t} value={t}>{t}</option>
+                {[
+                  { value: 'INQUILINO', label: 'Inquilino' },
+                  { value: 'PROPIETARIO', label: 'Propietario' },
+                  { value: 'COMPRA', label: 'Compra' },
+                  { value: 'VENTA', label: 'Venta' },
+                  { value: 'INVERSION_HOLDERS', label: 'Inversión Holders' }
+                ].map(t => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
                 ))}
               </select>
             </div>
@@ -111,7 +117,19 @@ export default function NewExpedientPage() {
           </div>
 
           <div>
-            <label className="label">Dirección del inmueble</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="label mb-0">Dirección del inmueble</label>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setValue('propertyAddress', '')}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                  Sabe domicilio
+                </button>
+                <button type="button" onClick={() => setValue('propertyAddress', 'No sabe')}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                  No sabe
+                </button>
+              </div>
+            </div>
             <input type="text" className="input" placeholder="Calle Mayor 1, Piso 2A"
               {...register('propertyAddress')} />
           </div>

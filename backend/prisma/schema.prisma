@@ -35,6 +35,9 @@ enum OperationType {
   PROMOCION
   EDIFICIO
   RESORT
+  INQUILINO
+  PROPIETARIO
+  INVERSION_HOLDERS
 }
 
 enum OperationSize {
@@ -44,18 +47,25 @@ enum OperationSize {
 
 enum Phase {
   CAPTACION
+  VALORACION
   FORMULARIO
   DOCUMENTACION
   VALIDACION
   ACUERDO
   MARKETING_FORMULARIO
   MARKETING_EJECUCION
+  VISITAS
   PREVENTA
   BUSQUEDA_ACTIVA
+  NEGOCIACION
   ACUERDO_INTERESADO
+  ARRAS
+  HIPOTECA
+  NOTARIA
   CIERRE
   POSVENTA
   CERRADO
+  CANCELADO
   BLOQUEADO
 }
 
@@ -140,6 +150,7 @@ model Client {
   updatedAt     DateTime   @updatedAt
 
   expedients     Expedient[]
+  roles          ExpedientClient[]
   calendarEvents CalendarEvent[]
 
   @@map("clients")
@@ -179,7 +190,33 @@ model Expedient {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Nuevos campos
+  propertyCatastral   String?
+  propertyYear        Int?
+  propertyStatus      String?
+  propertyOrientation String?
+  propertyParking     Boolean   @default(false)
+  propertyStorage     Boolean   @default(false)
+  commissionFixed     Decimal?  @db.Decimal(12, 2)
+  commissionPercent   Decimal?  @db.Decimal(5, 2)
+  commissionInvoiced  Boolean   @default(false)
+  commissionPaid      Boolean   @default(false)
+  mortgageStatus      String?
+  mortgageEntity      String?
+
+  // Arras y Notaría
+  arrasAmount         Decimal?  @db.Decimal(12, 2)
+  arrasDeadline       DateTime?
+  notaryName          String?
+  notaryDate          DateTime?
+  notaryAddress       String?
+
+  // Valoración
+  valuationEstimated   Decimal?  @db.Decimal(12, 2)
+  valuationMarketNotes String?
+
   client         Client                @relation(fields: [clientId], references: [id])
+  clientRoles    ExpedientClient[]
   assignments    ExpedientAssignment[]
   checklists     ChecklistInstance[]
   documents      Document[]
@@ -187,9 +224,40 @@ model Expedient {
   notifications  Notification[]
   phaseHistory   PhaseHistory[]
   buyers         Buyer[]
+  visits         Visit[]
   calendarEvents CalendarEvent[]
 
   @@map("expedients")
+}
+
+model ExpedientClient {
+  id          String   @id @default(cuid())
+  expedientId String
+  clientId    String
+  role        String   // VENDEDOR, COMPRADOR, PROPIETARIO, INQUILINO, GARANTE, REPRESENTANTE
+  createdAt   DateTime @default(now())
+
+  expedient Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+  client    Client    @relation(fields: [clientId], references: [id])
+
+  @@unique([expedientId, clientId, role])
+  @@map("expedient_clients")
+}
+
+model Visit {
+  id            String   @id @default(cuid())
+  expedientId   String
+  date          DateTime @default(now())
+  visitorName   String
+  visitorPhone  String?
+  feedback      String?
+  interestLevel String   @default("MID") // LOW, MID, HIGH
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  expedient Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+
+  @@map("visits")
 }
 
 model ExpedientAssignment {
@@ -198,6 +266,7 @@ model ExpedientAssignment {
   userId      String
   role        UserRole
   isPrimary   Boolean  @default(false)
+  commissionSplit Decimal? @db.Decimal(5, 2)
   createdAt   DateTime @default(now())
 
   expedient Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
@@ -408,4 +477,19 @@ model Notification {
   user      User?      @relation(fields: [userId], references: [id])
 
   @@map("notifications")
+}
+
+model BaseDocument {
+  id          String   @id @default(cuid())
+  name        String
+  category    String?  // VENTA, ALQUILER, GENERAL
+  driveUrl    String?
+  driveFileId String?
+  localPath   String?
+  mimeType    String?
+  fileSize    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("base_documents")
 }

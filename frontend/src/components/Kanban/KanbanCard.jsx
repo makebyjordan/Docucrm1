@@ -2,12 +2,10 @@ import { MapPin, User, AlertTriangle } from 'lucide-react'
 
 const TYPE_COLORS = {
   VENTA: 'bg-blue-100 text-blue-700',
-  ALQUILER: 'bg-green-100 text-green-700',
+  INQUILINO: 'bg-green-100 text-green-700',
   COMPRA: 'bg-yellow-100 text-yellow-700',
-  INVERSION: 'bg-purple-100 text-purple-700',
-  PROMOCION: 'bg-pink-100 text-pink-700',
-  EDIFICIO: 'bg-red-100 text-red-700',
-  RESORT: 'bg-cyan-100 text-cyan-700',
+  PROPIETARIO: 'bg-orange-100 text-orange-700',
+  INVERSION_HOLDERS: 'bg-purple-100 text-purple-700',
 }
 
 export default function KanbanCard({ expedient }) {

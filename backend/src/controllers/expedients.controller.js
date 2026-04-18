@@ -100,11 +100,13 @@ async function getById(req, res) {
       assignments: { include: { user: { select: { id: true, name: true, email: true, role: true, phone: true } } } },
       checklists: {
         include: { template: true, items: { orderBy: { order: 'asc' } } },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: 'desc' },
       },
       documents: { orderBy: { createdAt: 'desc' } },
       signatures: { orderBy: { createdAt: 'desc' } },
       buyers: { orderBy: { createdAt: 'desc' } },
+      visits: { orderBy: { date: 'desc' } },
+      clientRoles: { include: { client: true }, orderBy: { createdAt: 'asc' } },
       phaseHistory: {
         include: { changedBy: { select: { name: true, role: true } } },
         orderBy: { createdAt: 'desc' },

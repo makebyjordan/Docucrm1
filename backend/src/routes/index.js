@@ -12,5 +12,8 @@ router.use('/dashboard', authenticate, require('./dashboard.routes'));
 router.use('/email-templates', authenticate, require('./emailTemplates.routes'));
 router.use('/users', authenticate, require('./users.routes'));
 router.use('/calendar', require('./calendar.routes'));
+router.use('/visits', authenticate, require('./visits.routes'));
+router.use('/participants', authenticate, require('./expedientClients.routes'));
+router.use('/base-documents', authenticate, require('./baseDocuments.routes'));
 
 module.exports = router;

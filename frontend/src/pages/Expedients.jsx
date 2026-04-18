@@ -32,8 +32,14 @@ export default function ExpedientsPage() {
           onChange={e => setFilters(f => ({ ...f, operationType: e.target.value }))}
         >
           <option value="">Todos los tipos</option>
-          {['VENTA', 'ALQUILER', 'COMPRA', 'INVERSION', 'PROMOCION', 'EDIFICIO', 'RESORT'].map(t => (
-            <option key={t} value={t}>{t}</option>
+          {[
+            { value: 'INQUILINO', label: 'Inquilino' },
+            { value: 'PROPIETARIO', label: 'Propietario' },
+            { value: 'COMPRA', label: 'Compra' },
+            { value: 'VENTA', label: 'Venta' },
+            { value: 'INVERSION_HOLDERS', label: 'Inversión Holders' }
+          ].map(t => (
+            <option key={t.value} value={t.value}>{t.label}</option>
           ))}
         </select>
 

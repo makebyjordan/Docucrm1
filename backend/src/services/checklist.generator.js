@@ -67,12 +67,24 @@ async function generateForPhase(expedientId, phase, operationType, operationSize
  * Verifica si todos los checklists obligatorios de una fase están completos.
  */
 async function isPhaseComplete(expedientId, phase) {
-  const instances = await prisma.checklistInstance.findMany({
+  let instances = await prisma.checklistInstance.findMany({
     where: { expedientId, phase },
     include: { items: true },
   });
 
-  if (instances.length === 0) return true; // Sin checklists = fase libre
+  // Si no hay instancias, intentamos generarlas ahora (recuperación proactiva)
+  if (instances.length === 0) {
+    const exp = await prisma.expedient.findUnique({ where: { id: expedientId } });
+    if (exp && !['CERRADO', 'CANCELADO', 'POSVENTA'].includes(phase)) {
+      instances = await generateForPhase(exp.id, phase, exp.operationType, exp.operationSize);
+    }
+  }
+
+  if (instances.length === 0) {
+    // Si después de intentar generar sigue sin haber nada en fases críticas, bloqueamos.
+    if (['CERRADO', 'CANCELADO'].includes(phase)) return true;
+    return false; 
+  }
 
   for (const instance of instances) {
     const requiredItems = instance.items.filter(i => i.required);

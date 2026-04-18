@@ -9,31 +9,35 @@ const logger = require('../config/logger');
  * Para fases condicionales (SÍ/NO), se usa el campo "decision".
  */
 const TRANSITIONS = {
-  CAPTACION:             { next: 'FORMULARIO' },
+  CAPTACION:             { next: 'VALORACION' },
+  VALORACION:            { next: 'FORMULARIO' },
   FORMULARIO:            { next: 'DOCUMENTACION' },
   DOCUMENTACION:         { next: 'VALIDACION' },
   VALIDACION:            {
-    // Si la validación es correcta → ACUERDO
-    // Si NO → bloquear y notificar al comercial
     next: 'ACUERDO',
     conditional: true,
     onNo: 'BLOQUEADO',
   },
   ACUERDO:               { next: 'MARKETING_FORMULARIO' },
   MARKETING_FORMULARIO:  { next: 'MARKETING_EJECUCION' },
-  MARKETING_EJECUCION:   { next: 'PREVENTA' },
+  MARKETING_EJECUCION:   { next: 'VISITAS' },
+  VISITAS:               { next: 'PREVENTA' },
   PREVENTA:              { next: 'BUSQUEDA_ACTIVA' },
   BUSQUEDA_ACTIVA:       {
-    // SÍ hay interesado → ACUERDO_INTERESADO
-    // NO → renovar exclusividad (volver a ACUERDO) o cerrar
-    next: 'ACUERDO_INTERESADO',
+    next: 'NEGOCIACION',
     conditional: true,
-    onNo: 'ACUERDO', // Renovar exclusividad
+    onNo: 'ACUERDO',
   },
-  ACUERDO_INTERESADO:    { next: 'CIERRE' },
+  NEGOCIACION:           { next: 'ACUERDO_INTERESADO' },
+  ACUERDO_INTERESADO:    { next: 'ARRAS' },
+  ARRAS:                 { 
+    next: 'HIPOTECA',
+    conditional: true,
+    onNo: 'NOTARIA', // Si no requiere hipoteca, salta a Notaría
+  },
+  HIPOTECA:              { next: 'NOTARIA' },
+  NOTARIA:               { next: 'CIERRE' },
   CIERRE:                {
-    // SÍ se cerró → POSVENTA
-    // NO → renovar exclusividad o cerrar
     next: 'POSVENTA',
     conditional: true,
     onNo: 'ACUERDO',
@@ -43,19 +47,53 @@ const TRANSITIONS = {
 
 const PHASE_LABELS = {
   CAPTACION: 'Captación',
+  VALORACION: 'Valoración',
   FORMULARIO: 'Formulario inicial',
   DOCUMENTACION: 'Documentación',
   VALIDACION: 'Validación',
-  ACUERDO: 'Acuerdo / Contrato',
-  MARKETING_FORMULARIO: 'Brief de Marketing',
-  MARKETING_EJECUCION: 'Producción de Marketing',
-  PREVENTA: 'Inicio Preventa',
+  ACUERDO: 'Acuerdo / Exclusiva',
+  MARKETING_FORMULARIO: 'Brief Marketing',
+  MARKETING_EJECUCION: 'Producción Mkt',
+  VISITAS: 'Registro de Visitas',
+  PREVENTA: 'Lanzamiento Preventa',
   BUSQUEDA_ACTIVA: 'Búsqueda activa',
-  ACUERDO_INTERESADO: 'Acuerdo con interesado',
-  CIERRE: 'Cierre',
+  NEGOCIACION: 'Negociación',
+  ACUERDO_INTERESADO: 'Propuesta / Señal',
+  ARRAS: 'Contrato de Arras',
+  HIPOTECA: 'Gestión Hipotecaria',
+  NOTARIA: 'Notaría y Firmas',
+  CIERRE: 'Cierre de operación',
   POSVENTA: 'Posventa',
-  CERRADO: 'Cerrado',
+  CERRADO: 'Finalizado',
 };
+
+/**
+ * Determina la siguiente fase basada en el contexto del expediente.
+ */
+function getNextPhase(expedient, currentPhase, decision) {
+  const transition = TRANSITIONS[currentPhase];
+  if (!transition) return null;
+
+  // LÓGICA ESPECIAL POR TIPO DE OPERACIÓN
+  
+  // 1. CAPTACION -> Siguiente
+  if (currentPhase === 'CAPTACION') {
+    // Si es COMPRA, saltamos VALORACION (un comprador no valora su propia casa para venderla)
+    if (expedient.operationType === 'COMPRA') {
+      return 'FORMULARIO';
+    }
+  }
+
+  // 2. Fases condicionales estándar
+  if (transition.conditional) {
+    if (decision === 'NO') {
+      return transition.onNo;
+    }
+    return transition.next;
+  }
+
+  return transition.next;
+}
 
 /**
  * Avanzar un expediente a la siguiente fase del flujo.
@@ -78,25 +116,17 @@ async function advance(expedient, user, notes, decision) {
     return { error: 'Hay ítems obligatorios del checklist sin completar en esta fase.' };
   }
 
-  let nextPhase;
-  let newStatus = 'ACTIVO';
+  // Determinar la siguiente fase inteligentemente
+  let nextPhase = getNextPhase(expedient, currentPhase, decision);
+  
+  if (transition.conditional && !decision) {
+    return { error: 'Esta fase requiere una decisión: SI o NO' };
+  }
 
-  if (transition.conditional) {
-    if (!decision) {
-      return { error: 'Esta fase requiere una decisión: SI o NO' };
-    }
-    if (decision === 'NO') {
-      if (transition.onNo === 'BLOQUEADO') {
-        newStatus = 'BLOQUEADO';
-        nextPhase = currentPhase; // Se queda en la misma fase pero bloqueado
-      } else {
-        nextPhase = transition.onNo;
-      }
-    } else {
-      nextPhase = transition.next;
-    }
-  } else {
-    nextPhase = transition.next;
+  let newStatus = 'ACTIVO';
+  if (nextPhase === 'BLOQUEADO') {
+    newStatus = 'BLOQUEADO';
+    nextPhase = currentPhase; // Se queda en la misma fase pero bloqueado
   }
 
   // Registrar cambio de fase

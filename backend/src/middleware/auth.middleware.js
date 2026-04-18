@@ -4,11 +4,11 @@ const prisma = new PrismaClient();
 
 async function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
+  const token = (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null) || req.query.token;
+
+  if (!token) {
     return res.status(401).json({ error: 'Token no proporcionado' });
   }
-
-  const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await prisma.user.findUnique({

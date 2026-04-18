@@ -1,14 +1,15 @@
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, FolderKanban, Users, Settings,
-  Building2, UserCog, CalendarDays,
+  Building2, UserCog, CalendarDays, FileText,
 } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/expedients', icon: FolderKanban, label: 'Expedientes' },
   { to: '/clients', icon: Users, label: 'Clientes' },
+  { to: '/expedients', icon: FolderKanban, label: 'Expedientes' },
+  { to: '/documents', icon: FileText, label: 'Documentos' },
   { to: '/users', icon: UserCog, label: 'Usuarios', roles: ['DIRECCION', 'ADMINISTRACION'] },
   { to: '/settings', icon: Settings, label: 'Configuración', roles: ['DIRECCION', 'ADMINISTRACION'] },
 ]

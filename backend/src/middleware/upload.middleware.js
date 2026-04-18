@@ -33,11 +33,16 @@ const fileFilter = (req, file, cb) => {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/csv',
+    'application/zip',
+    'application/x-zip-compressed',
+    'application/octet-stream', // Para algunos archivos binarios
+    'text/plain',
   ];
-  if (allowed.includes(file.mimetype)) {
+  if (allowed.includes(file.mimetype) || file.originalname.match(/\.(pdf|doc|docx|xls|xlsx|csv|zip|rar|jpg|jpeg|png|webp|txt)$/i)) {
     cb(null, true);
   } else {
-    cb(new Error('Tipo de archivo no permitido'), false);
+    cb(new Error(`Tipo de archivo no permitido: ${file.mimetype}`), false);
   }
 };
 
