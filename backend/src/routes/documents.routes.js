@@ -9,5 +9,6 @@ router.put('/:id/validate', ctrl.validate);
 router.put('/:id/reject', ctrl.reject);
 router.delete('/:id', ctrl.remove);
 router.get('/:id/download', ctrl.download);
+router.get('/:id/preview', ctrl.preview);
 
 module.exports = router;

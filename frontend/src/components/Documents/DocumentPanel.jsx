@@ -3,14 +3,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import {
   Upload, FileText, CheckCircle, XCircle, Clock,
-  Download, Trash2, ExternalLink, Info, AlertCircle
+  Download, Trash2, ExternalLink, Info, AlertCircle, Eye, Plus
 } from 'lucide-react'
 import api from '../../api/client'
 
 const STATUS_CONFIG = {
-  PENDIENTE: { label: 'Pendiente', icon: Clock, color: 'text-yellow-500 bg-yellow-50' },
+  PENDIENTE: { label: 'Completado', icon: CheckCircle, color: 'text-green-600 bg-green-50' },
   SUBIDO:    { label: 'Subido', icon: FileText, color: 'text-blue-500 bg-blue-50' },
-  VALIDADO:  { label: 'Validado', icon: CheckCircle, color: 'text-green-500 bg-green-50' },
+  VALIDADO:  { label: 'Validado', icon: CheckCircle, color: 'text-green-600 bg-green-50' },
   RECHAZADO: { label: 'Rechazado', icon: XCircle, color: 'text-red-500 bg-red-50' },
 }
 
@@ -56,18 +56,45 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
   const [docName, setDocName] = useState('')
   const [selectedNeeded, setSelectedNeeded] = useState(null)
 
-  const { data: documents, isLoading } = useQuery({
+  const { data: documents, isLoading: docLoading } = useQuery({
     queryKey: ['documents', expedientId],
     queryFn: () => api.get(`/documents/expedient/${expedientId}`).then(r => r.data),
   })
 
+  const { data: checklists, isLoading: checkLoading } = useQuery({
+    queryKey: ['checklists', expedientId],
+    queryFn: () => api.get(`/checklists/expedient/${expedientId}`).then(r => r.data),
+  })
+
+  const currentChecklist = checklists?.find(c => c.phase === currentPhase)
   const neededDocs = REQUIRED_DOCS[operationType] || []
-  
-  // Mapeo de documentos subidos por tipo para identificar cuáles faltan
+
+  // Mapeo de documentos subidos por tipo
   const uploadedTypes = (documents || []).reduce((acc, doc) => {
     acc[doc.docType] = true
     return acc
   }, {})
+
+  // Mapeo de ítems del checklist para ver cuáles ya están ahí
+  const checklistLabels = (currentChecklist?.items || []).map(i => i.label.toLowerCase())
+
+  const addItemToChecklist = useMutation({
+    mutationFn: (label) => api.post(`/checklists/instance/${currentChecklist.id}/items`, { label, required: true }),
+    onSuccess: () => {
+      toast.success('Añadido al checklist')
+      qc.invalidateQueries(['checklists', expedientId])
+      qc.invalidateQueries(['expedient', expedientId])
+    }
+  })
+
+  const syncAllToChecklist = () => {
+    if (!currentChecklist) return toast.error('No hay checklist activo en esta fase')
+    const toAdd = neededDocs.filter(doc => !uploadedTypes[doc.type] && !checklistLabels.includes(doc.label.toLowerCase()))
+    if (toAdd.length === 0) return toast.success('Ya están todos en el checklist')
+    
+    Promise.all(toAdd.map(doc => addItemToChecklist.mutateAsync(doc.label)))
+      .then(() => toast.success('Requisitos sincronizados'))
+  }
 
   async function handleUpload(e) {
     const file = e.target.files?.[0]
@@ -76,11 +103,11 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
     setUploading(true)
     const formData = new FormData()
     formData.append('file', file)
-    
+
     // Si venimos de un placeholder "Necesario", usamos ese tipo
     const finalType = selectedNeeded ? selectedNeeded.type : docType
     const finalName = selectedNeeded ? selectedNeeded.label : (docName || file.name)
-    
+
     formData.append('docType', finalType)
     formData.append('name', finalName)
     formData.append('phase', currentPhase)
@@ -116,7 +143,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
     onSuccess: () => qc.invalidateQueries(['documents', expedientId]),
   })
 
-  if (isLoading) return <div className="text-gray-400 text-center py-10">Cargando documentos...</div>
+  if (docLoading || checkLoading) return <div className="text-gray-400 text-center py-10">Cargando documentos...</div>
 
   // Documentos subidos agrupados
   const grouped = (documents || []).reduce((acc, doc) => {
@@ -128,13 +155,24 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
+
       {/* Columna Izquierda: Documentación Necesaria */}
       <div className="lg:col-span-1 space-y-4">
         <div className="card p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Info className="text-blue-500" size={18} />
-            <h4 className="font-semibold text-gray-900 text-sm">Documentación Necesaria</h4>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Info className="text-blue-500" size={18} />
+              <h4 className="font-semibold text-gray-900 text-sm">Documentación Necesaria</h4>
+            </div>
+            {currentChecklist && (
+              <button 
+                onClick={syncAllToChecklist}
+                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
+                title="Añadir requisitos pendientes al checklist de esta fase"
+              >
+                <Plus size={12} /> Sincronizar
+              </button>
+            )}
           </div>
           <p className="text-[10px] text-gray-400 mb-4 bg-gray-50 p-2 rounded italic">
             Basado en un flujo de <strong className="text-blue-600">{operationType}</strong>
@@ -144,12 +182,10 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
             {neededDocs.map(doc => {
               const isUploaded = uploadedTypes[doc.type]
               return (
-                <div key={doc.type} 
-                  className={`p-3 rounded-xl border transition-all ${
-                    isUploaded ? 'bg-green-50 border-green-100' : 'bg-white border-gray-100'
-                  }`}
+                <div key={doc.type}
+                  className={`p-3 rounded-xl border transition-all ${isUploaded ? 'bg-green-50 border-green-100' : 'bg-white border-gray-100'
+                    }`}
                 >
-                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {isUploaded ? (
                         <CheckCircle size={14} className="text-green-500" />
@@ -160,18 +196,28 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                         {doc.label}
                       </span>
                     </div>
-                    {!isUploaded && (
-                      <button 
-                        onClick={() => {
-                          setSelectedNeeded(doc)
-                          fileRef.current?.click()
-                        }}
-                        className="text-[10px] bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
-                      >
-                        Subir
-                      </button>
-                    )}
-                  </div>
+                    <div className="flex items-center gap-2">
+                      {!isUploaded && !checklistLabels.includes(doc.label.toLowerCase()) && (
+                        <button 
+                          onClick={() => addItemToChecklist.mutate(doc.label)}
+                          className="p-1 hover:text-blue-600 text-gray-400 transition-colors"
+                          title="Añadir tarea al checklist"
+                        >
+                          <Plus size={14} />
+                        </button>
+                      )}
+                      {!isUploaded && (
+                        <button
+                          onClick={() => {
+                            setSelectedNeeded(doc)
+                            fileRef.current?.click()
+                          }}
+                          className="text-[10px] bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
+                        >
+                          Subir
+                        </button>
+                      )}
+                    </div>
                   <p className="text-[10px] text-gray-500 mt-1 pl-5">{doc.description}</p>
                 </div>
               )
@@ -182,7 +228,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
 
       {/* Columna Derecha: Gestor de Archivos */}
       <div className="lg:col-span-2 space-y-4">
-        
+
         {/* Upload zone */}
         <div className="card p-5">
           <h4 className="font-semibold mb-3 text-gray-900 text-sm">Subir otro documento</h4>
@@ -253,6 +299,16 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
+                        <button 
+                          onClick={() => {
+                            const token = localStorage.getItem('crm_token');
+                            window.open(`/api/documents/${doc.id}/preview?token=${token}`, '_blank');
+                          }}
+                          className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all"
+                          title="Ver documento"
+                        >
+                          <Eye size={15} />
+                        </button>
                         {doc.driveUrl && (
                           <a href={doc.driveUrl} target="_blank" rel="noreferrer"
                             className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all"
@@ -278,7 +334,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                             <button onClick={() => {
                               const reason = prompt('Motivo del rechazo:')
                               if (reason) rejectMutation.mutate({ docId: doc.id, reason })
-                            }} 
+                            }}
                               className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all"
                               title="Rechazar"
                             >
@@ -288,7 +344,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                         )}
                         <button onClick={() => {
                           if (confirm('¿Eliminar este documento?')) deleteMutation.mutate(doc.id)
-                        }} 
+                        }}
                           className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all"
                           title="Eliminar"
                         >

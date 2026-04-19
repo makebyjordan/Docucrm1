@@ -46,7 +46,7 @@ async function listByExpedient(req, res) {
       template: true,
       items: { orderBy: { order: 'asc' } },
     },
-    orderBy: { createdAt: 'asc' },
+    orderBy: { createdAt: 'desc' },
   });
 
   // Añadir porcentaje de completitud

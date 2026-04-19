@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const path = require('path');
 const fs = require('fs');
+const mammoth = require('mammoth');
 const driveService = require('../services/drive.service');
 const notificationEngine = require('../services/notification.engine');
 const logger = require('../config/logger');
@@ -128,12 +129,16 @@ async function download(req, res) {
     const doc = await prisma.document.findUnique({ where: { id: req.params.id } });
     if (!doc) return res.status(404).json({ error: 'Documento no encontrado' });
 
-    if (doc.driveUrl) {
-      return res.redirect(doc.driveUrl);
-    }
-
     if (doc.filePath && fs.existsSync(doc.filePath)) {
-      return res.download(doc.filePath, doc.name);
+      const absolutePath = path.resolve(doc.filePath);
+      const ext = path.extname(doc.filePath);
+      const safeName = doc.name.endsWith(ext) ? doc.name : `${doc.name}${ext}`;
+      
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(safeName)}"`);
+      if (doc.mimeType) res.setHeader('Content-Type', doc.mimeType);
+      return res.sendFile(absolutePath);
+    } else if (doc.driveUrl) {
+      return res.redirect(doc.driveUrl);
     }
 
     res.status(404).json({ error: 'Archivo no disponible' });
@@ -143,4 +148,42 @@ async function download(req, res) {
   }
 }
 
-module.exports = { listByExpedient, upload, validate, reject, remove, download };
+async function preview(req, res) {
+  const { id } = req.params;
+  try {
+    const doc = await prisma.document.findUnique({ where: { id } });
+    if (!doc) return res.status(404).json({ error: 'Documento no encontrado' });
+
+    if (!doc.filePath || !fs.existsSync(doc.filePath)) {
+      if (doc.driveUrl) return res.redirect(doc.driveUrl);
+      return res.status(404).json({ error: 'Archivo no disponible' });
+    }
+
+    const absolutePath = path.resolve(doc.filePath);
+    const mime = doc.mimeType || '';
+
+    // PDFs e imágenes: el navegador los renderiza nativamente
+    if (mime === 'application/pdf' || mime.startsWith('image/')) {
+      res.setHeader('Content-Type', mime);
+      res.setHeader('Content-Disposition', 'inline');
+      return res.sendFile(absolutePath);
+    }
+
+    // DOCX: convertir a HTML con mammoth
+    if (mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      const result = await mammoth.convertToHtml({ path: absolutePath });
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+        <style>body{font-family:system-ui,-apple-system,sans-serif;line-height:1.6;padding:40px;max-width:800px;margin:0 auto;background:#fff;color:#333;} h1,h2{color:#1a365d;} table{border-collapse:collapse;width:100%;margin:20px 0;} th,td{border:1px solid #e2e8f0;padding:12px;text-align:left;} th{background:#f7fafc;}</style>
+        </head><body>${result.value}</body></html>`;
+      return res.send(html);
+    }
+
+    return res.send(`<!DOCTYPE html><html><body>Vista previa no disponible. Formato: ${mime}</body></html>`);
+
+  } catch (err) {
+    logger.error('[Documents] Error en preview:', err);
+    res.status(500).json({ error: 'Error al generar vista previa' });
+  }
+}
+
+module.exports = { listByExpedient, upload, validate, reject, remove, download, preview };
