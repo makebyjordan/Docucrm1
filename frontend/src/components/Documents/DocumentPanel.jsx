@@ -92,6 +92,29 @@ const REQUIRED_DOCS = {
     { type: 'ESCRITURA_AVALISTA', label: 'Escritura Propiedad Avalista', description: 'Si ofrece garantía real' },
     { type: 'SEGURO_IMPAGO', label: 'Seguro de Impago Alquiler', description: 'Si lo requiere el propietario' },
     { type: 'CUENTA_BANCARIA', label: 'Cuenta Bancaria Domiciliación', description: 'Para el pago mensual de la renta' },
+  ],
+  PROPIETARIO: [
+    { type: 'DNI_NIE_CIF', label: 'DNI / NIE / CIF Propietario', description: 'Documento de identidad del titular' },
+    { type: 'ESCRITURA_PROPIEDAD', label: 'Escritura de Propiedad', description: 'Título que acredita la titularidad' },
+    { type: 'IBI_RECIBO', label: 'Último recibo IBI', description: 'Impuesto de Bienes Inmuebles' },
+    { type: 'CEE', label: 'Certificado Eficiencia Energética', description: 'Obligatorio para alquilar (vigente)' },
+    { type: 'CEDULA_HABITABILIDAD', label: 'Cédula de Habitabilidad', description: 'Vigente y válida' },
+    { type: 'PLANOS_INMUEBLE', label: 'Planos del Inmueble', description: 'Para marketing y contrato' },
+    { type: 'RECIBO_SUMINISTROS', label: 'Últimos recibos Agua/Luz/Gas', description: 'Para cambio de titularidad/domiciliación' },
+    { type: 'INVENTARIO_MUEBLES', label: 'Inventario y Fotos Contenido', description: 'Detalle de mobiliario y estado' },
+    { type: 'MANDATO_ALQUILER', label: 'Mandato de Alquiler / Exclusiva', description: 'Contrato con la agencia' },
+    { type: 'ACTA_ENTREGA_LLAVES', label: 'Resguardo de llaves', description: 'Firmado al entregar las llaves a la agencia' },
+    { type: 'CERT_COMUNIDAD', label: 'Certificado estar al corriente Comunidad', description: 'Firmado por el administrador' },
+  ],
+  INVERSION_HOLDERS: [
+    { type: 'DNI_CIF', label: 'DNI / CIF del Inversor', description: 'Identificación fiscal' },
+    { type: 'POF', label: 'Proof of Funds (Prueba de fondos)', description: 'Extracto o certificado bancario reciente' },
+    { type: 'CONTRATO_SERVICIO', label: 'Contrato de Búsqueda y Gestión', description: 'Acuerdo firmado con la agencia' },
+    { type: 'KYC_FORM', label: 'Formulario KYC / Blanqueo', description: 'Cumplimiento normativo PBC' },
+    { type: 'DOSSIER_REQUERIMIENTOS', label: 'Dossier de Inversión', description: 'Criterios detallados del inversor' },
+    { type: 'ESTUDIO_VIABILIDAD', label: 'Estudio de Viabilidad', description: 'Análisis financiero del activo seleccionado' },
+    { type: 'CONTRATO_ARRAS', label: 'Contrato de Arras / Reserva', description: 'Documento firmado de reserva de activo' },
+    { type: 'ESCRITURA_COMPRA', label: 'Escritura de Compraventa', description: 'Copia simple de la adquisición' },
   ]
 }
 

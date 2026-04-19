@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { Mail, Send, Eye, Save } from 'lucide-react'
+import { Mail, Send, Eye, Save, Settings as SettingsIcon, Briefcase, Pencil, Trash2, Plus, X, CheckCircle2, ChevronUp, ChevronDown } from 'lucide-react'
 import api from '../api/client'
 
 const TYPE_LABELS = {
@@ -18,7 +18,38 @@ const TYPE_LABELS = {
   POSVENTA_12_MESES: 'Posventa — 12 meses (solicitud de reseña)',
 }
 
+const OPERATION_ORDER = {
+  VENTA: ['CAPTACION', 'VALORACION', 'FORMULARIO', 'DOCUMENTACION', 'VALIDACION', 'ACUERDO', 'MARKETING_FORMULARIO', 'MARKETING_EJECUCION', 'PREVENTA', 'BUSQUEDA_ACTIVA', 'NEGOCIACION', 'PROPUESTA', 'ARRAS', 'HIPOTECA', 'NOTARIA', 'CIERRE', 'POSVENTA'],
+  COMPRA: ['CAPTACION', 'FORMULARIO', 'DOCUMENTACION', 'BUSQUEDA_ACTIVA', 'VISITAS', 'NEGOCIACION', 'ARRAS', 'HIPOTECA', 'CIERRE', 'POSVENTA'],
+  INQUILINO: ['CAPTACION', 'FORMULARIO', 'DOCUMENTACION', 'VALIDACION', 'VISITAS', 'NEGOCIACION', 'ACUERDO_INTERESADO', 'CIERRE', 'POSVENTA'],
+  PROPIETARIO: ['CAPTACION', 'VALORACION', 'FORMULARIO', 'DOCUMENTACION', 'ACUERDO', 'MARKETING_FORMULARIO', 'MARKETING_EJECUCION', 'VISITAS', 'NEGOCIACION', 'CIERRE', 'POSVENTA'],
+  INVERSION_HOLDERS: ['CAPTACION', 'FORMULARIO', 'DOCUMENTACION', 'BUSQUEDA_ACTIVA', 'VALORACION', 'VISITAS', 'NEGOCIACION', 'ARRAS', 'CIERRE', 'POSVENTA'],
+}
+
+const PHASE_NAMES = {
+  CAPTACION: 'Captación / Perfilado',
+  VALORACION: 'Valoración / ROI',
+  FORMULARIO: 'Ficha / Criterios',
+  DOCUMENTACION: 'Documentación / KYC',
+  VALIDACION: 'Validación / Solvencia',
+  ACUERDO: 'Acuerdo / Mandato',
+  MARKETING_FORMULARIO: 'Briefing Mkt',
+  MARKETING_EJECUCION: 'Marketing activo',
+  PREVENTA: 'Preventa',
+  BUSQUEDA_ACTIVA: 'Búsqueda Activa',
+  VISITAS: 'Visitas',
+  NEGOCIACION: 'Negociación',
+  PROPUESTA: 'Propuesta',
+  ARRAS: 'Reserva / Arras',
+  ACUERDO_INTERESADO: 'Acuerdo Inquilino',
+  HIPOTECA: 'Hipoteca',
+  NOTARIA: 'Notaría',
+  CIERRE: 'Cierre / Contrato',
+  POSVENTA: 'Cierre / Gestión',
+}
+
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState('notifications') // 'notifications' | 'operations'
   const [selectedId, setSelectedId] = useState(null)
   const [testEmail, setTestEmail] = useState('')
   const qc = useQueryClient()
@@ -28,17 +59,84 @@ export default function SettingsPage() {
     queryFn: () => api.get('/email-templates').then(r => r.data),
   })
 
+  const { data: checklistTemplates, isLoading: isLoadingChecklists } = useQuery({
+    queryKey: ['checklist-templates'],
+    queryFn: () => api.get('/checklists/templates').then(r => r.data),
+  })
+
   const sendTestMutation = useMutation({
     mutationFn: () => api.post('/notifications/test', { email: testEmail }),
     onSuccess: () => toast.success(`Email de prueba enviado a ${testEmail}`),
     onError: () => toast.error('Error al enviar email de prueba'),
   })
 
+  const createPhaseMutation = useMutation({
+    mutationFn: (operationType) => api.post('/checklists/templates', {
+      name: 'Nueva Fase',
+      operationType,
+      operationSize: 'INDIVIDUAL',
+      phase: 'CAPTACION', // Default
+      order: 99, // Will be sorted at the end
+      items: [{ label: 'Tarea inicial', required: true }]
+    }),
+    onSuccess: () => {
+      toast.success('Nueva fase creada')
+      qc.invalidateQueries(['checklist-templates'])
+    }
+  })
+
   const selected = templates?.find(t => t.id === selectedId)
+
+  const movePhase = async (opKey, index, direction) => {
+    const opTemplates = checklistTemplates?.filter(t => t.operationType === opKey) || [];
+    const sorted = [...opTemplates].sort((a,b) => (a.order || 0) - (b.order || 0));
+    
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === sorted.length - 1) return;
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const item = sorted.splice(index, 1)[0];
+    sorted.splice(targetIndex, 0, item);
+
+    const updates = sorted.map((t, i) => ({ id: t.id, order: i }));
+    await api.post('/checklists/templates/bulk-order', { templates: updates });
+    qc.invalidateQueries(['checklist-templates']);
+    toast.success('Orden actualizado');
+  }
 
   return (
     <div className="space-y-6">
-      {/* Test email */}
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('notifications')}
+          className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+            activeTab === 'notifications' 
+              ? 'border-blue-600 text-blue-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <Mail size={16} /> Notificaciones
+          </div>
+        </button>
+        <button
+          onClick={() => setActiveTab('operations')}
+          className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+            activeTab === 'operations' 
+              ? 'border-blue-600 text-blue-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <Briefcase size={16} /> Configuración Tipos de Operación
+          </div>
+        </button>
+      </div>
+
+      {activeTab === 'notifications' ? (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          {/* Test email */}
       <div className="card p-5">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <Mail size={18} /> Probar sistema de email
@@ -81,6 +179,225 @@ export default function SettingsPage() {
               />
             ))
           )}
+        </div>
+          </div>
+        </div>
+      ) : (
+        <div className="animate-in fade-in duration-300 space-y-8">
+          {isLoadingChecklists ? (
+            <div className="text-center text-gray-400 py-20">Cargando flujos de trabajo...</div>
+          ) : (
+            Object.keys(OPERATION_ORDER).map(opKey => {
+              const opTemplates = checklistTemplates?.filter(t => t.operationType === opKey) || [];
+              const sortedPhases = [...opTemplates].sort((a,b) => (a.order || 0) - (b.order || 0));
+
+              return (
+                <div key={opKey} className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-600/10 text-blue-600 rounded-lg flex items-center justify-center">
+                        <Briefcase size={20} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900">{opKey}</h3>
+                        <p className="text-xs text-gray-500 uppercase">Workflow especializado</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => createPhaseMutation.mutate(opKey)}
+                      className="btn-secondary text-xs py-1.5"
+                    >
+                      <Plus size={14} /> Nueva Fase
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    {sortedPhases.map((template, idx) => (
+                      <PhaseEditor 
+                        key={template.id} 
+                        template={template} 
+                        order={idx + 1}
+                        onRefresh={() => qc.invalidateQueries(['checklist-templates'])}
+                        onMoveUp={() => movePhase(opKey, idx, 'up')}
+                        onMoveDown={() => movePhase(opKey, idx, 'down')}
+                        isFirst={idx === 0}
+                        isLast={idx === sortedPhases.length - 1}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PhaseEditor({ template, order, onRefresh, onMoveUp, onMoveDown, isFirst, isLast }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [formData, setFormData] = useState({
+    name: template.name,
+    phase: template.phase,
+    items: template.items.map(i => ({ ...i }))
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: (data) => api.put(`/checklists/templates/${template.id}`, data),
+    onSuccess: () => {
+      toast.success('Fase actualizada')
+      setIsEditing(false)
+      onRefresh()
+    }
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => api.delete(`/checklists/templates/${template.id}`),
+    onSuccess: () => {
+      toast.success('Fase eliminada')
+      onRefresh()
+    }
+  })
+
+  const addItem = () => {
+    setFormData({
+      ...formData,
+      items: [...formData.items, { label: 'Nueva tarea', required: true }]
+    })
+  }
+
+  const removeItem = (idx) => {
+    setFormData({
+      ...formData,
+      items: formData.items.filter((_, i) => i !== idx)
+    })
+  }
+
+  const updateItem = (idx, field, value) => {
+    const newItems = [...formData.items]
+    newItems[idx][field] = value
+    setFormData({ ...formData, items: newItems })
+  }
+
+  if (!isEditing) {
+    return (
+      <div className="card overflow-hidden border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
+        <div className="px-5 py-3 bg-gray-50/50 flex items-center justify-between border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
+              {order}
+            </span>
+            <span className="font-semibold text-gray-900 text-sm">{template.name}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-gray-400 font-mono tracking-widest mr-4">{template.phase}</span>
+            
+            <div className="flex border-r border-gray-200 pr-2 mr-2 gap-1">
+              <button 
+                onClick={onMoveUp} disabled={isFirst}
+                className={`p-1 rounded hover:bg-gray-100 ${isFirst ? 'opacity-20 cursor-not-allowed' : 'text-gray-500 hover:text-blue-600'}`}
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button 
+                onClick={onMoveDown} disabled={isLast}
+                className={`p-1 rounded hover:bg-gray-100 ${isLast ? 'opacity-20 cursor-not-allowed' : 'text-gray-500 hover:text-blue-600'}`}
+              >
+                <ChevronDown size={14} />
+              </button>
+            </div>
+
+            <button onClick={() => setIsEditing(true)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50">
+              <Pencil size={14} />
+            </button>
+            <button 
+              onClick={() => window.confirm('¿Borrar esta fase?') && deleteMutation.mutate()} 
+              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        </div>
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2">
+          {template.items.map(item => (
+            <div key={item.id} className="flex items-start gap-2">
+              <CheckCircle2 size={14} className="mt-1 text-gray-300" />
+              <p className="text-sm text-gray-600 truncate">
+                {item.label}
+                {item.required && <span className="text-red-400 ml-1">*</span>}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="card overflow-hidden border-2 border-blue-500 bg-white shadow-xl animate-in zoom-in-95 duration-200">
+      <div className="px-5 py-4 bg-blue-50 border-b border-blue-100 space-y-3">
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <label className="text-[10px] font-bold text-blue-600 uppercase mb-1 block">Nombre de la Fase</label>
+            <input 
+              type="text" className="input bg-white text-sm" 
+              value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} 
+            />
+          </div>
+          <div className="w-48">
+            <label className="text-[10px] font-bold text-blue-600 uppercase mb-1 block">Fase Técnica</label>
+            <select 
+              className="input bg-white text-sm"
+              value={formData.phase} onChange={e => setFormData({...formData, phase: e.target.value})}
+            >
+              {Object.keys(PHASE_NAMES).map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <h5 className="text-sm font-bold text-gray-700">Tareas del Checklist</h5>
+          <button onClick={addItem} className="text-blue-600 text-xs font-semibold flex items-center gap-1 hover:underline">
+            <Plus size={14} /> Añadir tarea
+          </button>
+        </div>
+
+        <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+          {formData.items.map((item, idx) => (
+            <div key={idx} className="flex gap-3 items-center group">
+              <input 
+                type="text" className="input text-sm py-1.5" 
+                value={item.label} onChange={e => updateItem(idx, 'label', e.target.value)} 
+              />
+              <label className="flex items-center gap-2 cursor-pointer shrink-0">
+                <input 
+                  type="checkbox" checked={item.required} 
+                  onChange={e => updateItem(idx, 'required', e.target.checked)}
+                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-xs text-gray-500 font-medium">Req.</span>
+              </label>
+              <button onClick={() => removeItem(idx)} className="p-1.5 text-gray-400 hover:text-red-500">
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-4 border-t flex justify-end gap-3">
+          <button onClick={() => setIsEditing(false)} className="btn-secondary text-xs">Cancelar</button>
+          <button 
+            onClick={() => updateMutation.mutate(formData)} 
+            disabled={updateMutation.isPending}
+            className="btn-primary text-xs"
+          >
+            <Save size={14} /> {updateMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
+          </button>
         </div>
       </div>
     </div>

@@ -1,4 +1,6 @@
 import { Check, AlertTriangle } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import api from '../../api/client'
 
 const STEPS = [
   { id: 'CAPTACION', label: 'Captación' },
@@ -34,19 +36,52 @@ const INQUILINO_STEPS = [
   { id: 'POSVENTA', label: 'Seguim.' },
 ]
 
-export default function WorkflowStepper({ currentPhase, status, operationType }) {
-  // Seleccionar pasos según el tipo de operación
-  let visibleSteps;
+// Fases específicas del proceso de PROPIETARIO (Alquiler)
+const PROPIETARIO_STEPS = [
+  { id: 'CAPTACION', label: 'Captación' },
+  { id: 'VALORACION', label: 'Valorac.' },
+  { id: 'FORMULARIO', label: 'Formaliz.' },
+  { id: 'DOCUMENTACION', label: 'Docs.' },
+  { id: 'ACUERDO', label: 'Mandato' },
+  { id: 'MARKETING_FORMULARIO', label: 'Brief' },
+  { id: 'MARKETING_EJECUCION', label: 'G. Mkt' },
+  { id: 'VISITAS', label: 'Visitas' },
+  { id: 'NEGOCIACION', label: 'Negociac.' },
+  { id: 'CIERRE', label: 'Contrato' },
+  { id: 'POSVENTA', label: 'Gestión' },
+]
 
-  if (operationType === 'INQUILINO') {
-    visibleSteps = INQUILINO_STEPS;
-  } else {
-    visibleSteps = STEPS.filter(step => {
-      // Si es COMPRA, saltamos VALORACIÓN
-      if (operationType === 'COMPRA' && step.id === 'VALORACION') return false;
-      return true;
-    });
-  }
+// Fases específicas del proceso de INVERSOR
+const INVERSOR_STEPS = [
+  { id: 'CAPTACION', label: 'Perfilado' },
+  { id: 'FORMULARIO', label: 'Criterios' },
+  { id: 'DOCUMENTACION', label: 'KYC' },
+  { id: 'BUSQUEDA_ACTIVA', label: 'Búsqueda' },
+  { id: 'VALORACION', label: 'Análisis' },
+  { id: 'VISITAS', label: 'Visitas' },
+  { id: 'NEGOCIACION', label: 'Oferta' },
+  { id: 'ARRAS', label: 'Reserva' },
+  { id: 'CIERRE', label: 'Compra' },
+  { id: 'POSVENTA', label: 'Gestión' },
+]
+
+export default function WorkflowStepper({ currentPhase, status, operationType }) {
+  const { data: checklistTemplates } = useQuery({
+    queryKey: ['checklist-templates', operationType],
+    queryFn: () => api.get('/checklists/templates', { params: { operationType } }).then(r => r.data),
+  })
+
+  // Generar pasos dinámicamente desde la base de datos
+  const dbSteps = checklistTemplates
+    ?.sort((a, b) => (a.order || 0) - (b.order || 0))
+    .map(t => ({ id: t.phase, label: t.name }));
+
+  const visibleSteps = dbSteps && dbSteps.length > 0 
+    ? dbSteps 
+    : STEPS.filter(step => {
+        if (operationType === 'COMPRA' && step.id === 'VALORACION') return false;
+        return true;
+      });
 
   const currentIdx = visibleSteps.findIndex(s => s.id === currentPhase)
 

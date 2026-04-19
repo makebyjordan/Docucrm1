@@ -59,6 +59,37 @@ const INQUILINO_PHASE_LABELS = {
   CANCELADO: 'Cancelado',
 }
 
+const PROPIETARIO_PHASE_LABELS = {
+  CAPTACION: 'Captación de propiedad',
+  VALORACION: 'Valoración de mercado',
+  FORMULARIO: 'Ficha de propiedad',
+  DOCUMENTACION: 'Documentación legal',
+  ACUERDO: 'Mandato de alquiler',
+  MARKETING_FORMULARIO: 'Briefing marketing',
+  MARKETING_EJECUCION: 'Producción y anuncios',
+  VISITAS: 'Registro de visitas',
+  NEGOCIACION: 'Filtro y negociación',
+  CIERRE: 'Firma de contrato',
+  POSVENTA: 'Gestión alquiler',
+  CERRADO: 'Finalizado',
+  CANCELADO: 'Cancelado',
+}
+
+const INVERSOR_PHASE_LABELS = {
+  CAPTACION: 'Perfilado de inversor',
+  FORMULARIO: 'Criterios de inversión',
+  DOCUMENTACION: 'KYC y Fondos',
+  BUSQUEDA_ACTIVA: 'Búsqueda de activos',
+  VALORACION: 'Análisis de ROI/Yield',
+  VISITAS: 'Visitas técnicas',
+  NEGOCIACION: 'Oferta y negociación',
+  ARRAS: 'Reserva de activo',
+  CIERRE: 'Cierre de compra',
+  POSVENTA: 'Gestión rentabilidad',
+  CERRADO: 'Finalizado',
+  CANCELADO: 'Cancelado',
+}
+
 const CONDITIONAL_PHASES = ['VALIDACION', 'BUSQUEDA_ACTIVA', 'ARRAS', 'CIERRE']
 
 export default function ExpedientDetailPage() {
@@ -81,13 +112,23 @@ export default function ExpedientDetailPage() {
     if (exp?.operationType === 'INQUILINO') {
       return INQUILINO_PHASE_LABELS[phase] || PHASE_LABELS[phase] || phase
     }
+    if (exp?.operationType === 'PROPIETARIO') {
+      return PROPIETARIO_PHASE_LABELS[phase] || PHASE_LABELS[phase] || phase
+    }
+    if (exp?.operationType === 'INVERSION_HOLDERS') {
+      return INVERSOR_PHASE_LABELS[phase] || PHASE_LABELS[phase] || phase
+    }
     return PHASE_LABELS[phase] || phase
   }
 
   // Fases condicionales para este tipo de operación
   const isConditional = exp?.operationType === 'INQUILINO'
-    ? ['VALIDACION'].includes(exp?.currentPhase)  // Solo solvencia es condicional para inquilino
-    : CONDITIONAL_PHASES.includes(exp?.currentPhase)
+    ? ['VALIDACION'].includes(exp?.currentPhase) 
+    : exp?.operationType === 'PROPIETARIO'
+      ? ['VALIDACION'].includes(exp?.currentPhase)
+      : exp?.operationType === 'INVERSION_HOLDERS'
+        ? ['ARRAS'].includes(exp?.currentPhase)
+        : CONDITIONAL_PHASES.includes(exp?.currentPhase)
 
   // Lógica de validación de checklists
   const currentChecklists = exp?.checklists?.filter(c => c.phase === exp?.currentPhase) || []
@@ -866,7 +907,9 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Arras y Notaría */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-gray-900">Arras y Notaría</h4>
+          <h4 className="font-semibold text-gray-900">
+            {(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Reserva y Contrato' : 'Arras y Notaría'}
+          </h4>
           {!editingInmueble ? (
             <button onClick={() => setEditingInmueble(true)} className="text-gray-400 hover:text-blue-600 transition-colors">
               <Pencil size={16} />
@@ -886,19 +929,19 @@ function ExpedientOverview({ exp, renewMutation }) {
         {!editingInmueble ? (
           <dl className="space-y-2 text-sm">
             <div className="flex">
-              <dt className="w-28 text-gray-500">{exp.operationType === 'INQUILINO' ? 'Importe Reserva' : 'Importe Arras'}</dt>
+              <dt className="w-28 text-gray-500">{(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Importe Reserva' : 'Importe Arras'}</dt>
               <dd className="font-medium">{exp.arrasAmount ? `${Number(exp.arrasAmount).toLocaleString('es-ES')} €` : '—'}</dd>
             </div>
             <div className="flex">
-              <dt className="w-28 text-gray-500">{exp.operationType === 'INQUILINO' ? 'Vencimiento Reserva' : 'Vencimiento Arras'}</dt>
+              <dt className="w-28 text-gray-500">{(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Vencimiento Reserva' : 'Vencimiento Arras'}</dt>
               <dd className="font-medium text-red-600">{exp.arrasDeadline ? new Date(exp.arrasDeadline).toLocaleDateString('es-ES') : '—'}</dd>
             </div>
             <div className="flex border-t pt-2 mt-2">
-              <dt className="w-28 text-gray-500">{exp.operationType === 'INQUILINO' ? 'Lugar de Firma' : 'Notario'}</dt>
+              <dt className="w-28 text-gray-500">{(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Lugar de Firma' : 'Notario'}</dt>
               <dd className="font-medium">{exp.notaryName || '—'}</dd>
             </div>
             <div className="flex">
-              <dt className="w-28 text-gray-500">{exp.operationType === 'INQUILINO' ? 'Fecha Firma' : 'Fecha Cita'}</dt>
+              <dt className="w-28 text-gray-500">{(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Fecha Firma' : 'Fecha Cita'}</dt>
               <dd className="font-medium text-blue-600 font-bold">{exp.notaryDate ? new Date(exp.notaryDate).toLocaleDateString('es-ES') : '—'}</dd>
             </div>
           </dl>
@@ -906,23 +949,23 @@ function ExpedientOverview({ exp, renewMutation }) {
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label text-xs">{exp.operationType === 'INQUILINO' ? 'Importe Reserva' : 'Importe Arras'}</label>
+                <label className="label text-xs">{(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Importe Reserva' : 'Importe Arras'}</label>
                 <input type="number" className="input text-sm" value={inmuebleForm.arrasAmount}
                   onChange={e => setInmuebleForm({ ...inmuebleForm, arrasAmount: e.target.value })} />
               </div>
               <div>
-                <label className="label text-xs">{exp.operationType === 'INQUILINO' ? 'Vencimiento Reserva' : 'Vencimiento Arras'}</label>
+                <label className="label text-xs">{(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Vencimiento Reserva' : 'Vencimiento Arras'}</label>
                 <input type="date" className="input text-sm" value={inmuebleForm.arrasDeadline}
                   onChange={e => setInmuebleForm({ ...inmuebleForm, arrasDeadline: e.target.value })} />
               </div>
             </div>
             <div>
-              <label className="label text-xs">{exp.operationType === 'INQUILINO' ? 'Lugar de Firma' : 'Notario / Notaría'}</label>
+              <label className="label text-xs">{(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Lugar de Firma' : 'Notario / Notaría'}</label>
               <input type="text" className="input text-sm" value={inmuebleForm.notaryName}
                 onChange={e => setInmuebleForm({ ...inmuebleForm, notaryName: e.target.value })} />
             </div>
             <div>
-              <label className="label text-xs">{exp.operationType === 'INQUILINO' ? 'Fecha Firma' : 'Fecha Notaría'}</label>
+              <label className="label text-xs">{(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Fecha Firma' : 'Fecha Notaría'}</label>
               <input type="date" className="input text-sm" value={inmuebleForm.notaryDate}
                 onChange={e => setInmuebleForm({ ...inmuebleForm, notaryDate: e.target.value })} />
             </div>
@@ -970,10 +1013,11 @@ function ExpedientOverview({ exp, renewMutation }) {
 
 function PhaseHistoryTab({ history = [], operationType }) {
   const getLabel = (phase) => {
-    if (operationType === 'INQUILINO') {
-      return INQUILINO_PHASE_LABELS[phase] || PHASE_LABELS[phase] || phase
-    }
-    return PHASE_LABELS[phase] || phase
+    const labels = operationType === 'INQUILINO' ? INQUILINO_PHASE_LABELS : 
+                   operationType === 'PROPIETARIO' ? PROPIETARIO_PHASE_LABELS :
+                   operationType === 'INVERSION_HOLDERS' ? INVERSOR_PHASE_LABELS :
+                   PHASE_LABELS;
+    return labels[phase] || phase
   }
 
   return (
