@@ -97,8 +97,8 @@ export default function WorkflowStepper({ currentPhase, status, operationType })
             <div key={step.id} className="flex items-center">
               <div className="flex flex-col items-center">
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                  blocked ? 'bg-red-500 text-white' :
-                  done    ? 'bg-green-500 text-white' :
+                  blocked ? 'bg-[var(--sidebar-bg)]0 text-white' :
+                  done    ? 'bg-[var(--sidebar-bg)]0 text-white' :
                   active  ? 'bg-blue-600 text-white ring-4 ring-blue-100' :
                             'bg-gray-200 text-gray-500'
                 }`}>

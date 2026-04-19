@@ -41,38 +41,38 @@ export default function ClientsPage() {
           <div className="text-center text-gray-400 py-10">Cargando...</div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="table-header">
               <tr>
                 {['Nombre / Empresa', 'Tipo', 'Email', 'Teléfono', 'Expedientes', ''].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
+                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wide">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-[var(--border-color)]">
               {clients.length === 0 && (
                 <tr><td colSpan={6} className="text-center text-gray-400 py-10">Sin clientes</td></tr>
               )}
               {clients.map(c => (
-                <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                <tr key={c.id} className="table-row">
+                  <td className="px-4 py-3 font-medium text-[var(--text-main)]">
                     {c.firstName ? `${c.firstName} ${c.lastName || ''}`.trim() : c.companyName}
-                    {c.dni && <span className="text-xs text-gray-400 ml-2">({c.dni})</span>}
+                    {c.dni && <span className="text-xs text-[var(--text-muted)] ml-2">({c.dni})</span>}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="badge bg-blue-50 text-blue-700">{c.type}</span>
+                    <span className="badge bg-[var(--bg-color)] text-[var(--secondary-color)] border border-[var(--border-color)]">{c.type}</span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{c.email}</td>
-                  <td className="px-4 py-3 text-gray-600">{c.phone}</td>
+                  <td className="px-4 py-3 text-[var(--text-muted)]">{c.email}</td>
+                  <td className="px-4 py-3 text-[var(--text-muted)]">{c.phone}</td>
                   <td className="px-4 py-3">
-                    <span className="badge bg-gray-100 text-gray-700">{c._count?.expedients || 0}</span>
+                    <span className="badge bg-[var(--bg-color)] text-[var(--text-muted)] border border-[var(--border-color)]">{c._count?.expedients || 0}</span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => setModal(c)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded">
+                      <button onClick={() => setModal(c)} className="p-1.5 text-[var(--text-muted)] hover:text-[var(--primary-color)] transition-colors">
                         <Edit2 size={15} />
                       </button>
                       <button onClick={() => { if (confirm('¿Eliminar cliente?')) deleteMutation.mutate(c.id) }}
-                        className="p-1.5 text-gray-400 hover:text-red-600 rounded">
+                        className="p-1.5 text-[var(--text-muted)] hover:text-red-500 transition-colors">
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -109,20 +109,20 @@ function ClientModal({ client, onClose, onSaved }) {
   })
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="card p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="card p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-bold text-lg">{client ? 'Editar cliente' : 'Nuevo cliente'}</h3>
-          <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-700"><X size={20} /></button>
+          <h3 className="font-bold text-lg text-[var(--text-main)]">{client ? 'Editar cliente' : 'Nuevo cliente'}</h3>
+          <button onClick={onClose} className="p-1 text-[var(--text-muted)] hover:text-[var(--text-main)]"><X size={20} /></button>
         </div>
 
         <form onSubmit={handleSubmit(d => mutation.mutate(d))} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Tipo *</label>
-              <select className="select" {...register('type', { required: true })}>
+              <select className="input" {...register('type', { required: true })}>
                 {['INQUILINO', 'PROPIETARIO', 'COMPRADOR', 'VENDEDOR', 'INVERSOR', 'EMPRESA'].map(t => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t} className="bg-[var(--card-bg)]">{t}</option>
                 ))}
               </select>
             </div>
@@ -173,14 +173,14 @@ function ClientModal({ client, onClose, onSaved }) {
                 <button
                   type="button"
                   onClick={() => setValue('address', '')}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                  className="text-xs font-medium text-[var(--secondary-color)] hover:opacity-80 transition-opacity"
                 >
                   Sabe domicilio
                 </button>
                 <button
                   type="button"
                   onClick={() => setValue('address', 'No sabe')}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                  className="text-xs font-medium text-[var(--secondary-color)] hover:opacity-80 transition-opacity"
                 >
                   No sabe
                 </button>
@@ -201,8 +201,8 @@ function ClientModal({ client, onClose, onSaved }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <input type="checkbox" id="privacy" {...register('privacyPolicy')} />
-            <label htmlFor="privacy" className="text-sm text-gray-700">Política de privacidad aceptada</label>
+            <input type="checkbox" id="privacy" {...register('privacyPolicy')} className="text-[var(--primary-color)] focus:ring-[var(--primary-color)]" />
+            <label htmlFor="privacy" className="text-sm text-[var(--text-muted)]">Política de privacidad aceptada</label>
           </div>
 
           <div>
@@ -212,7 +212,7 @@ function ClientModal({ client, onClose, onSaved }) {
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary">Cancelar</button>
+            <button type="button" onClick={onClose} className="btn-secondary bg-transparent border border-[var(--border-color)]">Cancelar</button>
             <button type="submit" disabled={mutation.isPending} className="btn-primary">
               {mutation.isPending ? 'Guardando...' : 'Guardar'}
             </button>

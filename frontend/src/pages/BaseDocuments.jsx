@@ -49,9 +49,9 @@ export default function BaseDocuments() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[var(--card-bg)] p-6 rounded-2xl shadow-sm border border-[var(--border-color)]">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Repositorio de Documentos</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Repositorio de Documentos</h1>
           <p className="text-gray-500 text-sm">Gestiona plantillas y documentos base para toda la organización</p>
         </div>
         <button
@@ -88,15 +88,15 @@ export default function BaseDocuments() {
 
       <div className="flex flex-col gap-2">
         {filteredDocs.map(doc => (
-          <div key={doc.id} className="group bg-white px-4 py-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-sm transition-all flex items-center gap-4">
+          <div key={doc.id} className="group bg-[var(--card-bg)] px-4 py-3 rounded-xl border border-[var(--border-color)] hover:border-blue-200 hover:shadow-sm transition-all flex items-center gap-4">
             {/* Icono */}
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0">
+            <div className="p-2 bg-[var(--sidebar-bg)] text-blue-600 rounded-lg shrink-0">
               <FileText size={20} />
             </div>
             
             {/* Info principal */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-gray-900 leading-tight truncate" title={doc.name}>
+              <h3 className="font-bold text-[var(--text-main)] leading-tight truncate" title={doc.name}>
                 {doc.name}
               </h3>
               <div className="flex items-center gap-2 text-[10px] mt-0.5 whitespace-nowrap overflow-hidden">
@@ -140,7 +140,7 @@ export default function BaseDocuments() {
               <a 
                 href={`/api/base-documents/${doc.id}/download?token=${token}`}
                 download
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg text-[10px] font-bold transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--sidebar-bg)] text-[var(--text-muted)] hover:bg-gray-200 rounded-lg text-[10px] font-bold transition-colors"
               >
                 <Download size={12} /> Bajar
               </a>
@@ -149,7 +149,7 @@ export default function BaseDocuments() {
         ))}
 
         {filteredDocs.length === 0 && !isLoading && (
-          <div className="col-span-full py-20 text-center bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-100">
+          <div className="col-span-full py-20 text-center bg-[var(--bg-color)]/50 rounded-2xl border-2 border-dashed border-[var(--border-color)]">
             <FileIcon className="mx-auto text-gray-300 mb-3" size={48} />
             <p className="text-gray-400 font-medium">No se encontraron documentos</p>
             <p className="text-gray-300 text-sm">Prueba con otra búsqueda o añade uno nuevo</p>
@@ -184,10 +184,10 @@ function EditBaseModal({ doc, onClose, onSave, isPending }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex items-center justify-between p-5 border-b border-gray-100">
-          <h3 className="font-bold text-lg text-gray-900">Editar Documento Base</h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full transition-colors"><X size={20} /></button>
+      <div className="bg-[var(--card-bg)] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="flex items-center justify-between p-5 border-b border-[var(--border-color)]">
+          <h3 className="font-bold text-lg text-[var(--text-main)]">Editar Documento Base</h3>
+          <button onClick={onClose} className="p-1 hover:bg-[var(--sidebar-bg)] rounded-full transition-colors"><X size={20} /></button>
         </div>
 
         <form onSubmit={(e) => { e.preventDefault(); onSave({ name, category }) }} className="p-6 space-y-5">
@@ -213,7 +213,7 @@ function EditBaseModal({ doc, onClose, onSave, isPending }) {
           <div className="flex gap-3 pt-2">
             <button
               type="button" onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 font-medium text-sm"
+              className="flex-1 px-4 py-2.5 border border-[var(--border-color)] text-[var(--text-muted)] rounded-xl hover:bg-[var(--bg-color)] font-medium text-sm"
             >
               Cancelar
             </button>
@@ -259,15 +259,15 @@ function UploadBaseModal({ onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex items-center justify-between p-5 border-b border-gray-100">
-          <h3 className="font-bold text-lg text-gray-900">Subir Documento Base</h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-full transition-colors"><X size={20} /></button>
+      <div className="bg-[var(--card-bg)] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="flex items-center justify-between p-5 border-b border-[var(--border-color)]">
+          <h3 className="font-bold text-lg text-[var(--text-main)]">Subir Documento Base</h3>
+          <button onClick={onClose} className="p-1 hover:bg-[var(--sidebar-bg)] rounded-full transition-colors"><X size={20} /></button>
         </div>
 
         <form onSubmit={handleUpload} className="p-6 space-y-5">
           <div
-            className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${file ? 'border-blue-300 bg-blue-50/50' : 'border-gray-200 hover:border-gray-300'
+            className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${file ? 'border-blue-300 bg-[var(--sidebar-bg)]/50' : 'border-[var(--border-color)] hover:border-gray-300'
               }`}
           >
             <input
@@ -279,17 +279,17 @@ function UploadBaseModal({ onClose, onSuccess }) {
               }}
             />
             <label htmlFor="file-upload" className="cursor-pointer block">
-              <div className="mx-auto w-12 h-12 bg-white shadow-sm border border-gray-100 rounded-full flex items-center justify-center mb-3">
+              <div className="mx-auto w-12 h-12 bg-[var(--card-bg)] shadow-sm border border-[var(--border-color)] rounded-full flex items-center justify-center mb-3">
                 <Upload size={20} className={file ? 'text-blue-600' : 'text-gray-400'} />
               </div>
               {file ? (
                 <div className="space-y-1">
-                  <p className="text-sm font-bold text-gray-900 truncate max-w-[200px] mx-auto">{file.name}</p>
+                  <p className="text-sm font-bold text-[var(--text-main)] truncate max-w-[200px] mx-auto">{file.name}</p>
                   <p className="text-[10px] text-blue-600 uppercase">Archivo seleccionado</p>
                 </div>
               ) : (
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-900">Haz clic para buscar</p>
+                  <p className="text-sm font-medium text-[var(--text-main)]">Haz clic para buscar</p>
                   <p className="text-xs text-gray-400">Cualquier tipo de archivo</p>
                 </div>
               )}
@@ -317,7 +317,7 @@ function UploadBaseModal({ onClose, onSuccess }) {
           <div className="flex gap-3 pt-2">
             <button
               type="button" onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 font-medium text-sm"
+              className="flex-1 px-4 py-2.5 border border-[var(--border-color)] text-[var(--text-muted)] rounded-xl hover:bg-[var(--bg-color)] font-medium text-sm"
             >
               Cancelar
             </button>

@@ -24,20 +24,25 @@ const STATUS_COLORS = { ACTIVO: '#10b981', BLOQUEADO: '#ef4444', COMPLETADO: '#3
 
 function StatCard({ icon: Icon, label, value, color = 'blue', sub }) {
   const colors = {
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
-    red: 'bg-red-50 text-red-600',
-    yellow: 'bg-yellow-50 text-yellow-600',
+    blue: { bg: 'rgba(38, 99, 235, 0.1)', text: 'var(--secondary-color)' },
+    green: { bg: 'rgba(16, 185, 129, 0.1)', text: '#10b981' },
+    red: { bg: 'rgba(225, 29, 72, 0.1)', text: 'var(--primary-color)' },
+    yellow: { bg: 'rgba(245, 158, 11, 0.1)', text: '#f59e0b' },
   }
+  const themeColor = colors[color] || colors.blue;
+
   return (
-    <div className="card p-5 flex items-start gap-4">
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colors[color]}`}>
+    <div className="card p-5 flex items-start gap-4 transition-all hover:scale-[1.02] duration-300">
+      <div 
+        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+        style={{ backgroundColor: themeColor.bg, color: themeColor.text }}
+      >
         <Icon size={20} />
       </div>
-      <div>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        <p className="text-sm text-gray-500">{label}</p>
-        {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      <div className="min-w-0">
+        <p style={{ color: 'var(--text-main)' }} className="text-2xl font-bold">{value}</p>
+        <p style={{ color: 'var(--text-muted)' }} className="text-sm font-medium">{label}</p>
+        {sub && <p style={{ color: 'var(--tertiary-color)' }} className="text-xs mt-0.5">{sub}</p>}
       </div>
     </div>
   )
@@ -96,14 +101,18 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Por fase */}
         <div className="card p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">Expedientes por fase</h3>
+          <h3 style={{ color: 'var(--text-main)' }} className="font-semibold mb-4">Expedientes por fase</h3>
           {phaseData.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={phaseData} margin={{ left: -20 }}>
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar dataKey="expedientes" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Bar 
+                  dataKey="expedientes" 
+                  fill="var(--primary-color)" 
+                  radius={[4, 4, 0, 0]} 
+                />
               </BarChart>
             </ResponsiveContainer>
           ) : (
@@ -113,7 +122,7 @@ export default function DashboardPage() {
 
         {/* Por tipo */}
         <div className="card p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">Expedientes por tipo</h3>
+          <h3 style={{ color: 'var(--text-main)' }} className="font-semibold mb-4">Expedientes por tipo</h3>
           {typeData.length > 0 ? (
             <div className="flex items-center gap-6">
               <PieChart width={160} height={160}>
@@ -126,8 +135,8 @@ export default function DashboardPage() {
                 {typeData.map(item => (
                   <div key={item.name} className="flex items-center gap-2 text-sm">
                     <div className="w-3 h-3 rounded-full" style={{ background: item.color }} />
-                    <span className="text-gray-600">{item.name}</span>
-                    <span className="font-bold text-gray-900 ml-auto pl-4">{item.value}</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{item.name}</span>
+                    <span style={{ color: 'var(--text-main)' }} className="font-bold ml-auto pl-4">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -141,13 +150,13 @@ export default function DashboardPage() {
       {/* Alertas */}
       {alerts?.blocked?.length > 0 && (
         <div className="card p-5">
-          <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <h3 style={{ color: 'var(--text-main)' }} className="font-semibold mb-3 flex items-center gap-2">
             <AlertTriangle size={16} className="text-red-500" />
             Expedientes bloqueados
           </h3>
           <div className="space-y-2">
             {alerts.blocked.map(exp => (
-              <div key={exp.id} className="flex items-center justify-between py-2 px-3 bg-red-50 rounded-lg">
+              <div key={exp.id} className="flex items-center justify-between py-2 px-3 bg-[var(--sidebar-bg)] rounded-lg">
                 <div>
                   <span className="font-mono text-sm font-bold text-gray-800">{exp.code}</span>
                   <span className="text-gray-500 text-sm ml-2">
@@ -165,13 +174,13 @@ export default function DashboardPage() {
 
       {/* Actividad reciente */}
       <div className="card p-5">
-        <h3 className="font-semibold text-gray-900 mb-3">Actividad reciente</h3>
+        <h3 style={{ color: 'var(--text-main)' }} className="font-semibold mb-3">Actividad reciente</h3>
         {activity?.recentPhaseChanges?.length > 0 ? (
           <div className="space-y-2">
             {activity.recentPhaseChanges.map(change => (
-              <div key={change.id} className="flex items-center gap-3 text-sm py-2 border-b border-gray-100 last:border-0">
-                <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
-                <span className="font-mono text-gray-600 text-xs">{change.expedient?.code}</span>
+              <div key={change.id} className="flex items-center gap-3 text-sm py-2 border-b border-[var(--border-color)] last:border-0">
+                <div className="w-2 h-2 rounded-full bg-[var(--sidebar-bg)]0 shrink-0" />
+                <span className="font-mono text-[var(--text-muted)] text-xs">{change.expedient?.code}</span>
                 <span className="text-gray-500 flex-1">
                   {PHASE_LABELS[change.fromPhase] || change.fromPhase} → <strong>{PHASE_LABELS[change.toPhase] || change.toPhase}</strong>
                 </span>

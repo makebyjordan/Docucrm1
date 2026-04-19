@@ -61,13 +61,13 @@ export default function NewExpedientPage() {
         <button onClick={() => navigate('/expedients')} className="btn-secondary px-2">
           <ArrowLeft size={16} />
         </button>
-        <h2 className="text-xl font-bold text-gray-900">Nuevo expediente</h2>
+        <h2 className="text-xl font-bold text-[var(--text-main)]">Nuevo expediente</h2>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Sección 1: Cliente */}
         <div className="card p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900">1. Cliente</h3>
+          <h3 className="font-semibold text-[var(--text-main)]">1. Cliente</h3>
 
           <div>
             <label className="label">Cliente existente</label>
@@ -88,7 +88,7 @@ export default function NewExpedientPage() {
 
         {/* Sección 2: Operación */}
         <div className="card p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900">2. Operación e inmueble</h3>
+          <h3 className="font-semibold text-[var(--text-main)]">2. Operación e inmueble</h3>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -163,7 +163,7 @@ export default function NewExpedientPage() {
 
         {/* Sección 3: Responsables */}
         <div className="card p-6 space-y-4">
-          <h3 className="font-semibold text-gray-900">3. Responsables</h3>
+          <h3 className="font-semibold text-[var(--text-main)]">3. Responsables</h3>
           <p className="text-sm text-gray-500">
             Tú serás asignado automáticamente como comercial.
           </p>
@@ -192,7 +192,7 @@ export default function NewExpedientPage() {
 
         {/* Notas */}
         <div className="card p-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Notas adicionales</h3>
+          <h3 className="font-semibold text-[var(--text-main)] mb-3">Notas adicionales</h3>
           <textarea className="input" rows={3} placeholder="Observaciones, contexto inicial..."
             {...register('notes')} />
         </div>

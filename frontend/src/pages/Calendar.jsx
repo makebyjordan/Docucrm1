@@ -13,8 +13,8 @@ import api from '../api/client'
 import toast from 'react-hot-toast'
 
 const EVENT_TYPES = [
-  { value: 'VISITA',    label: 'Visita',        color: 'bg-green-500' },
-  { value: 'REUNION',   label: 'Reunión',        color: 'bg-blue-500' },
+  { value: 'VISITA',    label: 'Visita',        color: 'bg-[var(--sidebar-bg)]0' },
+  { value: 'REUNION',   label: 'Reunión',        color: 'bg-[var(--sidebar-bg)]0' },
   { value: 'LLAMADA',   label: 'Llamada',        color: 'bg-yellow-500' },
   { value: 'FIRMA',     label: 'Firma',          color: 'bg-purple-500' },
   { value: 'OTRO',      label: 'Otro',           color: 'bg-gray-400' },
@@ -89,23 +89,23 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
+      <div className="bg-[var(--card-bg)] rounded-xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-semibold">{isEdit ? 'Editar evento' : 'Nuevo evento'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+          <button onClick={onClose} className="text-gray-400 hover:text-[var(--text-muted)]"><X size={20} /></button>
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
           {/* Título */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
+            <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">Título *</label>
             <input className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={form.title} onChange={e => set('title', e.target.value)} placeholder="Descripción del evento" />
           </div>
 
           {/* Tipo */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">Tipo</label>
             <div className="flex flex-wrap gap-2">
               {EVENT_TYPES.map(t => (
                 <button type="button" key={t.value}
@@ -113,7 +113,7 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
                     form.type === t.value
                       ? `${t.color} text-white border-transparent`
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                      : 'bg-[var(--card-bg)] text-[var(--text-muted)] border-gray-300 hover:border-gray-400'
                   }`}>
                   {t.label}
                 </button>
@@ -122,7 +122,7 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
           </div>
 
           {/* Todo el día */}
-          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-[var(--text-muted)] cursor-pointer">
             <input type="checkbox" checked={form.allDay} onChange={e => set('allDay', e.target.checked)}
               className="rounded" />
             Todo el día
@@ -131,14 +131,14 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
           {/* Fechas */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Inicio *</label>
+              <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">Inicio *</label>
               <input type={form.allDay ? 'date' : 'datetime-local'}
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={form.allDay ? form.startAt.slice(0, 10) : form.startAt}
                 onChange={e => set('startAt', e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fin</label>
+              <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">Fin</label>
               <input type={form.allDay ? 'date' : 'datetime-local'}
                 className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={form.allDay ? (form.endAt?.slice(0, 10) ?? '') : form.endAt}
@@ -148,7 +148,7 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
 
           {/* Cliente */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Cliente (opcional)</label>
+            <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">Cliente (opcional)</label>
             <select className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={form.clientId} onChange={e => set('clientId', e.target.value)}>
               <option value="">— Sin cliente —</option>
@@ -162,7 +162,7 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
 
           {/* Expediente */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Expediente (opcional)</label>
+            <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">Expediente (opcional)</label>
             <select className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={form.expedientId} onChange={e => set('expedientId', e.target.value)}>
               <option value="">— Sin expediente —</option>
@@ -174,7 +174,7 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
 
           {/* Notas */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+            <label className="block text-sm font-medium text-[var(--text-muted)] mb-1">Notas</label>
             <textarea rows={3}
               className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               value={form.notes} onChange={e => set('notes', e.target.value)}
@@ -183,7 +183,7 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
 
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-700 border rounded-lg hover:bg-gray-50">
+              className="px-4 py-2 text-sm text-[var(--text-muted)] border rounded-lg hover:bg-[var(--bg-color)]">
               Cancelar
             </button>
             <button type="submit" disabled={saving}
@@ -277,23 +277,23 @@ export default function CalendarPage() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b bg-white">
+      <div className="flex items-center justify-between px-6 py-4 border-b bg-[var(--card-bg)]">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-gray-900">Calendario</h1>
+          <h1 className="text-xl font-bold text-[var(--text-main)]">Calendario</h1>
 
           {/* Selector de vista */}
-          <div className="flex items-center bg-gray-100 rounded-lg p-1 gap-1">
+          <div className="flex items-center bg-[var(--sidebar-bg)] rounded-lg p-1 gap-1">
             <button
               onClick={() => setView('calendar')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                view === 'calendar' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                view === 'calendar' ? 'bg-[var(--card-bg)] shadow text-blue-600' : 'text-gray-500 hover:text-[var(--text-muted)]'
               }`}>
               <CalIcon size={14} /> Calendario
             </button>
             <button
               onClick={() => setView('list')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                view === 'list' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                view === 'list' ? 'bg-[var(--card-bg)] shadow text-blue-600' : 'text-gray-500 hover:text-[var(--text-muted)]'
               }`}>
               <List size={14} /> Lista
             </button>
@@ -302,18 +302,18 @@ export default function CalendarPage() {
           {view === 'calendar' && (
             <div className="flex items-center gap-1">
               <button onClick={() => setCurrent(subMonths(current, 1))}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">
+                className="p-1.5 rounded-lg hover:bg-[var(--sidebar-bg)] text-[var(--text-muted)]">
                 <ChevronLeft size={18} />
               </button>
-              <span className="text-sm font-semibold text-gray-700 w-36 text-center capitalize">
+              <span className="text-sm font-semibold text-[var(--text-muted)] w-36 text-center capitalize">
                 {format(current, 'MMMM yyyy', { locale: es })}
               </span>
               <button onClick={() => setCurrent(addMonths(current, 1))}
-                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">
+                className="p-1.5 rounded-lg hover:bg-[var(--sidebar-bg)] text-[var(--text-muted)]">
                 <ChevronRight size={18} />
               </button>
               <button onClick={() => setCurrent(new Date())}
-                className="text-xs px-2 py-1 border rounded-md text-gray-600 hover:bg-gray-50 ml-1">
+                className="text-xs px-2 py-1 border rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-color)] ml-1">
                 Hoy
               </button>
             </div>
@@ -343,7 +343,7 @@ export default function CalendarPage() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden border border-gray-200">
+          <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden border border-[var(--border-color)]">
             {days.map(day => {
               const dayEvents = eventsOnDay(day)
               const isCurrentMonth = isSameMonth(day, current)
@@ -352,12 +352,12 @@ export default function CalendarPage() {
                 <div
                   key={day.toISOString()}
                   onClick={() => setSelected(isSameDay(day, selected) ? null : day)}
-                  className={`bg-white min-h-[90px] p-1.5 cursor-pointer transition-colors ${
+                  className={`bg-[var(--card-bg)] min-h-[90px] p-1.5 cursor-pointer transition-colors ${
                     !isCurrentMonth ? 'opacity-40' : ''
-                  } ${isSelected ? 'ring-2 ring-inset ring-blue-500' : 'hover:bg-blue-50/40'}`}
+                  } ${isSelected ? 'ring-2 ring-inset ring-blue-500' : 'hover:bg-[var(--sidebar-bg)]/40'}`}
                 >
                   <div className={`text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
-                    isToday(day) ? 'bg-blue-600 text-white' : 'text-gray-700'
+                    isToday(day) ? 'bg-blue-600 text-white' : 'text-[var(--text-muted)]'
                   }`}>
                     {format(day, 'd')}
                   </div>
@@ -381,7 +381,7 @@ export default function CalendarPage() {
         </div>
 
         {/* ─── Panel lateral ────────────────────────────────────────────────── */}
-        <div className="w-72 border-l bg-white flex flex-col overflow-hidden shrink-0">
+        <div className="w-72 border-l bg-[var(--card-bg)] flex flex-col overflow-hidden shrink-0">
           {selected ? (
             <>
               <div className="px-4 py-3 border-b flex items-center justify-between">
@@ -523,13 +523,13 @@ function ListView({ events, loading, onEdit, onDelete }) {
         <div className="space-y-5">
           {entries.map(([key, evs]) => (
             <div key={key}>
-              <p className="text-sm font-semibold text-gray-700 mb-2 capitalize border-b pb-1.5">
+              <p className="text-sm font-semibold text-[var(--text-muted)] mb-2 capitalize border-b pb-1.5">
                 {format(parseISO(key), "EEEE, d 'de' MMMM yyyy", { locale: es })}
               </p>
               <div className="space-y-2 pl-2">
                 {evs.map(ev => (
                   <div key={ev.id}
-                    className="flex items-start gap-3 p-3 rounded-lg border bg-white hover:shadow-sm transition-shadow">
+                    className="flex items-start gap-3 p-3 rounded-lg border bg-[var(--card-bg)] hover:shadow-sm transition-shadow">
                     <div className={`w-1 self-stretch rounded-full shrink-0 ${typeColor(ev.type)}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -578,9 +578,9 @@ function ListView({ events, loading, onEdit, onDelete }) {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-5 bg-gray-50">
-      <Section title="Hoy" color="bg-blue-500" entries={today} />
-      <Section title="Próximos" color="bg-green-500" entries={upcoming} />
+    <div className="flex-1 overflow-y-auto px-6 py-5 bg-[var(--bg-color)]">
+      <Section title="Hoy" color="bg-[var(--sidebar-bg)]0" entries={today} />
+      <Section title="Próximos" color="bg-[var(--sidebar-bg)]0" entries={upcoming} />
       <Section title="Pasados" color="bg-gray-400" entries={[...past].reverse()} />
     </div>
   )

@@ -8,10 +8,10 @@ import {
 import api from '../../api/client'
 
 const STATUS_CONFIG = {
-  PENDIENTE: { label: 'Completado', icon: CheckCircle, color: 'text-green-600 bg-green-50' },
-  SUBIDO:    { label: 'Subido', icon: FileText, color: 'text-blue-500 bg-blue-50' },
-  VALIDADO:  { label: 'Validado', icon: CheckCircle, color: 'text-green-600 bg-green-50' },
-  RECHAZADO: { label: 'Rechazado', icon: XCircle, color: 'text-red-500 bg-red-50' },
+  PENDIENTE: { label: 'Completado', icon: CheckCircle, color: 'text-green-600 bg-[var(--sidebar-bg)]' },
+  SUBIDO:    { label: 'Subido', icon: FileText, color: 'text-blue-500 bg-[var(--sidebar-bg)]' },
+  VALIDADO:  { label: 'Validado', icon: CheckCircle, color: 'text-green-600 bg-[var(--sidebar-bg)]' },
+  RECHAZADO: { label: 'Rechazado', icon: XCircle, color: 'text-red-500 bg-[var(--sidebar-bg)]' },
 }
 
 // ─── Definición de documentos necesarios por flujo ────────────────────────────
@@ -232,7 +232,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Info className="text-blue-500" size={18} />
-              <h4 className="font-semibold text-gray-900 text-sm">Documentación Necesaria</h4>
+              <h4 className="font-semibold text-[var(--text-main)] text-sm">Documentación Necesaria</h4>
             </div>
             {currentChecklist && (
               <button 
@@ -244,7 +244,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
               </button>
             )}
           </div>
-          <p className="text-[10px] text-gray-400 mb-4 bg-gray-50 p-2 rounded italic">
+          <p className="text-[10px] text-gray-400 mb-4 bg-[var(--bg-color)] p-2 rounded italic">
             Basado en un flujo de <strong className="text-blue-600">{operationType}</strong>
           </p>
 
@@ -253,7 +253,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
               const isUploaded = uploadedTypes[doc.type]
               return (
                 <div key={doc.type}
-                  className={`p-3 rounded-xl border transition-all ${isUploaded ? 'bg-green-50 border-green-100' : 'bg-white border-gray-100'
+                  className={`p-3 rounded-xl border transition-all ${isUploaded ? 'bg-[var(--sidebar-bg)] border-green-100' : 'bg-[var(--card-bg)] border-[var(--border-color)]'
                     }`}
                 >
                     <div className="flex items-center gap-2">
@@ -262,7 +262,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                       ) : (
                         <AlertCircle size={14} className="text-gray-300" />
                       )}
-                      <span className={`text-xs font-bold ${isUploaded ? 'text-green-700' : 'text-gray-700'}`}>
+                      <span className={`text-xs font-bold ${isUploaded ? 'text-green-700' : 'text-[var(--text-muted)]'}`}>
                         {doc.label}
                       </span>
                     </div>
@@ -301,7 +301,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
 
         {/* Upload zone */}
         <div className="card p-5">
-          <h4 className="font-semibold mb-3 text-gray-900 text-sm">Subir otro documento</h4>
+          <h4 className="font-semibold mb-3 text-[var(--text-main)] text-sm">Subir otro documento</h4>
           <div className="flex items-end gap-3 flex-wrap">
             <div className="flex-1 min-w-40">
               <label className="label text-xs">Nombre descriptivo</label>
@@ -340,11 +340,11 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
         <div className="space-y-3">
           {Object.entries(grouped).map(([type, docs]) => (
             <div key={type} className="card overflow-hidden">
-              <div className="px-5 py-2 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
+              <div className="px-5 py-2 bg-[var(--bg-color)]/50 border-b border-[var(--border-color)] flex justify-between items-center">
                 <h5 className="font-bold text-[10px] text-gray-400 uppercase tracking-wider">
                   {type.replace(/_/g, ' ')}
                 </h5>
-                <span className="text-[10px] text-gray-400 bg-white px-2 py-0.5 rounded-full border">
+                <span className="text-[10px] text-gray-400 bg-[var(--card-bg)] px-2 py-0.5 rounded-full border">
                   {docs.length} {docs.length === 1 ? 'archivo' : 'archivos'}
                 </span>
               </div>
@@ -354,7 +354,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                   const Icon = cfg.icon
 
                   return (
-                    <div key={doc.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50/30 transition-colors">
+                    <div key={doc.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[var(--bg-color)]/30 transition-colors">
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.color}`}>
                         <Icon size={16} />
                       </div>
@@ -374,14 +374,14 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                             const token = localStorage.getItem('crm_token');
                             window.open(`/api/documents/${doc.id}/preview?token=${token}`, '_blank');
                           }}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all"
+                          className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
                           title="Ver documento"
                         >
                           <Eye size={15} />
                         </button>
                         {doc.driveUrl && (
                           <a href={doc.driveUrl} target="_blank" rel="noreferrer"
-                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all"
+                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
                             title="Ver en Google Drive"
                           >
                             <ExternalLink size={15} />
@@ -391,7 +391,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                           href={`/api/documents/${doc.id}/download?token=${localStorage.getItem('crm_token')}`} 
                           target="_blank" 
                           rel="noreferrer"
-                          className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all"
+                          className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
                           title="Descargar"
                         >
                           <Download size={15} />
@@ -399,7 +399,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                         {doc.status === 'SUBIDO' && (
                           <>
                             <button onClick={() => validateMutation.mutate(doc.id)}
-                              className="p-1.5 text-gray-400 hover:text-green-600 rounded-lg hover:bg-green-50 transition-all"
+                              className="p-1.5 text-gray-400 hover:text-green-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
                               title="Validar"
                             >
                               <CheckCircle size={15} />
@@ -408,7 +408,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                               const reason = prompt('Motivo del rechazo:')
                               if (reason) rejectMutation.mutate({ docId: doc.id, reason })
                             }}
-                              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all"
+                              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
                               title="Rechazar"
                             >
                               <XCircle size={15} />
@@ -418,7 +418,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                         <button onClick={() => {
                           if (confirm('¿Eliminar este documento?')) deleteMutation.mutate(doc.id)
                         }}
-                          className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all"
+                          className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
                           title="Eliminar"
                         >
                           <Trash2 size={15} />
@@ -432,7 +432,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
           ))}
 
           {(documents || []).length === 0 && (
-            <div className="card p-12 text-center border-dashed border-2 border-gray-200">
+            <div className="card p-12 text-center border-dashed border-2 border-[var(--border-color)]">
               <FileText size={40} className="text-gray-200 mx-auto mb-3" />
               <p className="text-sm text-gray-400 font-medium">Gestor de archivos vacío</p>
               <p className="text-[10px] text-gray-300 mt-1">Usa la columna de la izquierda para subir la documentación necesaria</p>

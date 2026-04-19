@@ -107,13 +107,13 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       {/* Tabs */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-[var(--border-color)]">
         <button
           onClick={() => setActiveTab('notifications')}
           className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'notifications' 
               ? 'border-blue-600 text-blue-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              : 'border-transparent text-gray-500 hover:text-[var(--text-muted)]'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -125,7 +125,7 @@ export default function SettingsPage() {
           className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'operations' 
               ? 'border-blue-600 text-blue-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              : 'border-transparent text-gray-500 hover:text-[var(--text-muted)]'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ export default function SettingsPage() {
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Test email */}
       <div className="card p-5">
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <h3 className="font-semibold text-[var(--text-main)] mb-3 flex items-center gap-2">
           <Mail size={18} /> Probar sistema de email
         </h3>
         <div className="flex gap-3">
@@ -159,10 +159,10 @@ export default function SettingsPage() {
 
       {/* Email templates */}
       <div className="card">
-        <div className="px-5 py-4 border-b border-gray-200">
-          <h3 className="font-semibold text-gray-900">Plantillas de email</h3>
+        <div className="px-5 py-4 border-b border-[var(--border-color)]">
+          <h3 className="font-semibold text-[var(--text-main)]">Plantillas de email</h3>
           <p className="text-sm text-gray-500 mt-0.5">
-            Personaliza los correos automáticos. Usa <code className="bg-gray-100 px-1 rounded">{'{{variable}}'}</code> para insertar datos dinámicos.
+            Personaliza los correos automáticos. Usa <code className="bg-[var(--sidebar-bg)] px-1 rounded">{'{{variable}}'}</code> para insertar datos dinámicos.
           </p>
         </div>
         <div className="divide-y divide-gray-100">
@@ -199,7 +199,7 @@ export default function SettingsPage() {
                         <Briefcase size={20} />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900">{opKey}</h3>
+                        <h3 className="text-lg font-bold text-[var(--text-main)]">{opKey}</h3>
                         <p className="text-xs text-gray-500 uppercase">Workflow especializado</p>
                       </div>
                     </div>
@@ -283,37 +283,37 @@ function PhaseEditor({ template, order, onRefresh, onMoveUp, onMoveDown, isFirst
   if (!isEditing) {
     return (
       <div className="card overflow-hidden border-l-4 border-l-blue-500 hover:shadow-md transition-shadow">
-        <div className="px-5 py-3 bg-gray-50/50 flex items-center justify-between border-b border-gray-100">
+        <div className="px-5 py-3 bg-[var(--bg-color)]/50 flex items-center justify-between border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
             <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
               {order}
             </span>
-            <span className="font-semibold text-gray-900 text-sm">{template.name}</span>
+            <span className="font-semibold text-[var(--text-main)] text-sm">{template.name}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-gray-400 font-mono tracking-widest mr-4">{template.phase}</span>
             
-            <div className="flex border-r border-gray-200 pr-2 mr-2 gap-1">
+            <div className="flex border-r border-[var(--border-color)] pr-2 mr-2 gap-1">
               <button 
                 onClick={onMoveUp} disabled={isFirst}
-                className={`p-1 rounded hover:bg-gray-100 ${isFirst ? 'opacity-20 cursor-not-allowed' : 'text-gray-500 hover:text-blue-600'}`}
+                className={`p-1 rounded hover:bg-[var(--sidebar-bg)] ${isFirst ? 'opacity-20 cursor-not-allowed' : 'text-gray-500 hover:text-blue-600'}`}
               >
                 <ChevronUp size={14} />
               </button>
               <button 
                 onClick={onMoveDown} disabled={isLast}
-                className={`p-1 rounded hover:bg-gray-100 ${isLast ? 'opacity-20 cursor-not-allowed' : 'text-gray-500 hover:text-blue-600'}`}
+                className={`p-1 rounded hover:bg-[var(--sidebar-bg)] ${isLast ? 'opacity-20 cursor-not-allowed' : 'text-gray-500 hover:text-blue-600'}`}
               >
                 <ChevronDown size={14} />
               </button>
             </div>
 
-            <button onClick={() => setIsEditing(true)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50">
+            <button onClick={() => setIsEditing(true)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)]">
               <Pencil size={14} />
             </button>
             <button 
               onClick={() => window.confirm('¿Borrar esta fase?') && deleteMutation.mutate()} 
-              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-[var(--sidebar-bg)]"
             >
               <Trash2 size={14} />
             </button>
@@ -323,7 +323,7 @@ function PhaseEditor({ template, order, onRefresh, onMoveUp, onMoveDown, isFirst
           {template.items.map(item => (
             <div key={item.id} className="flex items-start gap-2">
               <CheckCircle2 size={14} className="mt-1 text-gray-300" />
-              <p className="text-sm text-gray-600 truncate">
+              <p className="text-sm text-[var(--text-muted)] truncate">
                 {item.label}
                 {item.required && <span className="text-red-400 ml-1">*</span>}
               </p>
@@ -335,20 +335,20 @@ function PhaseEditor({ template, order, onRefresh, onMoveUp, onMoveDown, isFirst
   }
 
   return (
-    <div className="card overflow-hidden border-2 border-blue-500 bg-white shadow-xl animate-in zoom-in-95 duration-200">
-      <div className="px-5 py-4 bg-blue-50 border-b border-blue-100 space-y-3">
+    <div className="card overflow-hidden border-2 border-blue-500 bg-[var(--card-bg)] shadow-xl animate-in zoom-in-95 duration-200">
+      <div className="px-5 py-4 bg-[var(--sidebar-bg)] border-b border-blue-100 space-y-3">
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="text-[10px] font-bold text-blue-600 uppercase mb-1 block">Nombre de la Fase</label>
             <input 
-              type="text" className="input bg-white text-sm" 
+              type="text" className="input bg-[var(--card-bg)] text-sm" 
               value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} 
             />
           </div>
           <div className="w-48">
             <label className="text-[10px] font-bold text-blue-600 uppercase mb-1 block">Fase Técnica</label>
             <select 
-              className="input bg-white text-sm"
+              className="input bg-[var(--card-bg)] text-sm"
               value={formData.phase} onChange={e => setFormData({...formData, phase: e.target.value})}
             >
               {Object.keys(PHASE_NAMES).map(p => (
@@ -361,7 +361,7 @@ function PhaseEditor({ template, order, onRefresh, onMoveUp, onMoveDown, isFirst
 
       <div className="p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h5 className="text-sm font-bold text-gray-700">Tareas del Checklist</h5>
+          <h5 className="text-sm font-bold text-[var(--text-muted)]">Tareas del Checklist</h5>
           <button onClick={addItem} className="text-blue-600 text-xs font-semibold flex items-center gap-1 hover:underline">
             <Plus size={14} /> Añadir tarea
           </button>
@@ -421,22 +421,22 @@ function TemplateRow({ template, isSelected, onSelect, onSaved }) {
   })
 
   return (
-    <div className="border-b border-gray-100 last:border-0">
+    <div className="border-b border-[var(--border-color)] last:border-0">
       <div
-        className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-gray-50"
+        className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-[var(--bg-color)]"
         onClick={onSelect}
       >
         <div>
-          <p className="font-medium text-sm text-gray-900">{TYPE_LABELS[template.type] || template.type}</p>
+          <p className="font-medium text-sm text-[var(--text-main)]">{TYPE_LABELS[template.type] || template.type}</p>
           <p className="text-xs text-gray-500 mt-0.5 truncate max-w-xl">{template.subject}</p>
         </div>
-        <span className={`badge ${template.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'} text-xs`}>
+        <span className={`badge ${template.active ? 'bg-green-100 text-green-700' : 'bg-[var(--sidebar-bg)] text-gray-500'} text-xs`}>
           {template.active ? 'Activa' : 'Inactiva'}
         </span>
       </div>
 
       {isSelected && (
-        <div className="px-5 pb-5 space-y-4 bg-gray-50">
+        <div className="px-5 pb-5 space-y-4 bg-[var(--bg-color)]">
           <div>
             <label className="label">Asunto</label>
             <input type="text" className="input" value={subject} onChange={e => setSubject(e.target.value)} />
@@ -454,11 +454,11 @@ function TemplateRow({ template, isSelected, onSelect, onSaved }) {
 
           {preview && (
             <div className="border rounded-lg overflow-hidden">
-              <div className="bg-gray-200 px-3 py-1.5 text-xs text-gray-600 font-medium">
+              <div className="bg-gray-200 px-3 py-1.5 text-xs text-[var(--text-muted)] font-medium">
                 Vista previa: {preview.subject}
               </div>
               <div
-                className="p-4 text-sm bg-white max-h-64 overflow-y-auto"
+                className="p-4 text-sm bg-[var(--card-bg)] max-h-64 overflow-y-auto"
                 dangerouslySetInnerHTML={{ __html: preview.bodyHtml }}
               />
             </div>

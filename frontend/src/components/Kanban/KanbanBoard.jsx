@@ -5,18 +5,18 @@ import KanbanCard from './KanbanCard'
 import { AlertCircle } from 'lucide-react'
 
 const COLUMNS = [
-  { id: 'CAPTACION', label: 'Captación', color: 'bg-gray-200' },
-  { id: 'FORMULARIO', label: 'Formulario', color: 'bg-blue-100' },
-  { id: 'DOCUMENTACION', label: 'Documentación', color: 'bg-indigo-100' },
-  { id: 'VALIDACION', label: 'Validación', color: 'bg-purple-100' },
-  { id: 'ACUERDO', label: 'Acuerdo', color: 'bg-yellow-100' },
-  { id: 'MARKETING_FORMULARIO', label: 'Brief Mkt', color: 'bg-orange-100' },
-  { id: 'MARKETING_EJECUCION', label: 'Producción', color: 'bg-amber-100' },
-  { id: 'PREVENTA', label: 'Preventa', color: 'bg-green-100' },
-  { id: 'BUSQUEDA_ACTIVA', label: 'Búsqueda', color: 'bg-teal-100' },
-  { id: 'ACUERDO_INTERESADO', label: 'Interesado', color: 'bg-cyan-100' },
-  { id: 'CIERRE', label: 'Cierre', color: 'bg-emerald-100' },
-  { id: 'POSVENTA', label: 'Posventa', color: 'bg-lime-100' },
+  { id: 'CAPTACION', label: 'Captación', color: 'bg-[var(--sidebar-bg)] border-t-2 border-gray-500' },
+  { id: 'FORMULARIO', label: 'Formulario', color: 'bg-[var(--sidebar-bg)] border-t-2 border-blue-500' },
+  { id: 'DOCUMENTACION', label: 'Documentación', color: 'bg-[var(--sidebar-bg)] border-t-2 border-indigo-500' },
+  { id: 'VALIDACION', label: 'Validación', color: 'bg-[var(--sidebar-bg)] border-t-2 border-purple-500' },
+  { id: 'ACUERDO', label: 'Acuerdo', color: 'bg-[var(--sidebar-bg)] border-t-2 border-yellow-500' },
+  { id: 'MARKETING_FORMULARIO', label: 'Brief Mkt', color: 'bg-[var(--sidebar-bg)] border-t-2 border-orange-500' },
+  { id: 'MARKETING_EJECUCION', label: 'Producción', color: 'bg-[var(--sidebar-bg)] border-t-2 border-amber-500' },
+  { id: 'PREVENTA', label: 'Preventa', color: 'bg-[var(--sidebar-bg)] border-t-2 border-green-500' },
+  { id: 'BUSQUEDA_ACTIVA', label: 'Búsqueda', color: 'bg-[var(--sidebar-bg)] border-t-2 border-teal-500' },
+  { id: 'ACUERDO_INTERESADO', label: 'Interesado', color: 'bg-[var(--sidebar-bg)] border-t-2 border-cyan-500' },
+  { id: 'CIERRE', label: 'Cierre', color: 'bg-[var(--sidebar-bg)] border-t-2 border-emerald-500' },
+  { id: 'POSVENTA', label: 'Posventa', color: 'bg-[var(--sidebar-bg)] border-t-2 border-lime-500' },
 ]
 
 export default function KanbanBoard({ filters }) {
@@ -59,13 +59,13 @@ export default function KanbanBoard({ filters }) {
           <div key={col.id} className="flex-shrink-0 w-64">
             {/* Column header */}
             <div className={`rounded-t-lg px-3 py-2 ${col.color} flex items-center justify-between`}>
-              <span className="font-semibold text-sm text-gray-800">{col.label}</span>
-              <span className="text-xs bg-white/60 rounded-full px-2 py-0.5 font-mono font-bold">
+              <span className="font-semibold text-sm text-[var(--text-main)]">{col.label}</span>
+              <span className="text-xs bg-black/30 rounded-full px-2 py-0.5 font-mono font-bold text-[var(--text-main)]">
                 {cards.length}
               </span>
             </div>
             {/* Cards */}
-            <div className="bg-gray-100 rounded-b-lg min-h-24 p-2 space-y-2">
+            <div className="bg-[var(--sidebar-bg)] rounded-b-lg min-h-24 p-2 space-y-2">
               {cards.map(exp => (
                 <Link key={exp.id} to={`/expedients/${exp.id}`}>
                   <KanbanCard expedient={exp} />

@@ -201,13 +201,13 @@ export default function ExpedientDetailPage() {
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-bold text-gray-900 font-mono">{exp.code}</h2>
+            <h2 className="text-xl font-bold text-[var(--text-main)] font-mono">{exp.code}</h2>
             <span className={`badge text-xs ${
               exp.status === 'BLOQUEADO' ? 'bg-red-100 text-red-700' :
               exp.status === 'COMPLETADO' ? 'bg-blue-100 text-blue-700' :
               'bg-green-100 text-green-700'
             }`}>{exp.status}</span>
-            <span className="badge bg-gray-100 text-gray-700 text-xs">{exp.operationType}</span>
+            <span className="badge bg-[var(--sidebar-bg)] text-[var(--text-muted)] text-xs">{exp.operationType}</span>
             {exp.operationSize !== 'INDIVIDUAL' && (
               <span className="badge bg-purple-100 text-purple-700 text-xs">{exp.operationSize}</span>
             )}
@@ -235,7 +235,7 @@ export default function ExpedientDetailPage() {
                 <ArrowRight size={15} />
                 Avanzar fase
                 {!canAdvance && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm font-bold">
+                  <span className="absolute -top-2 -right-2 bg-[var(--sidebar-bg)]0 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm font-bold">
                     {pendingRequired}
                   </span>
                 )}
@@ -266,7 +266,7 @@ export default function ExpedientDetailPage() {
       <WorkflowStepper currentPhase={exp.currentPhase} status={exp.status} operationType={exp.operationType} />
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200 gap-1">
+      <div className="flex border-b border-[var(--border-color)] gap-1">
         {TABS.map(({ id: tabId, label, icon: Icon }) => (
           <button
             key={tabId}
@@ -304,7 +304,7 @@ export default function ExpedientDetailPage() {
       {advanceModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="card p-6 w-full max-w-md">
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-[var(--text-muted)] mb-4">
               Fase actual: <strong>{phaseLabel(exp.currentPhase)}</strong>
             </p>
 
@@ -327,7 +327,7 @@ export default function ExpedientDetailPage() {
                       key={d}
                       onClick={() => setDecision(d)}
                       className={`flex-1 py-2 rounded-lg border-2 text-sm font-bold transition-colors ${
-                        decision === d ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'
+                        decision === d ? 'border-blue-600 bg-[var(--sidebar-bg)] text-blue-700' : 'border-[var(--border-color)] text-[var(--text-muted)]'
                       }`}
                     >
                       {d === 'SI' ? '✓ Sí' : '✗ No'}
@@ -467,7 +467,7 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Datos del inmueble */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-gray-900">Datos del inmueble</h4>
+          <h4 className="font-semibold text-[var(--text-main)]">Datos del inmueble</h4>
           {!editingInmueble ? (
             <button onClick={() => setEditingInmueble(true)} className="text-gray-400 hover:text-blue-600 transition-colors">
               <Pencil size={16} />
@@ -503,7 +503,7 @@ function ExpedientOverview({ exp, renewMutation }) {
             ].map(([k, v]) => (
               <div key={k} className="flex">
                 <dt className="w-36 text-gray-500 shrink-0">{k}</dt>
-                <dd className="font-medium text-gray-900">{v}</dd>
+                <dd className="font-medium text-[var(--text-main)]">{v}</dd>
               </div>
             ))}
           </dl>
@@ -573,12 +573,12 @@ function ExpedientOverview({ exp, renewMutation }) {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={inmuebleForm.propertyParking} 
                   onChange={e => setInmuebleForm({ ...inmuebleForm, propertyParking: e.target.checked })} />
-                <span className="text-xs text-gray-700">Parking</span>
+                <span className="text-xs text-[var(--text-muted)]">Parking</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={inmuebleForm.propertyStorage} 
                   onChange={e => setInmuebleForm({ ...inmuebleForm, propertyStorage: e.target.checked })} />
-                <span className="text-xs text-gray-700">Trastero</span>
+                <span className="text-xs text-[var(--text-muted)]">Trastero</span>
               </label>
             </div>
           </form>
@@ -588,7 +588,7 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Datos del cliente */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-gray-900">Cliente</h4>
+          <h4 className="font-semibold text-[var(--text-main)]">Cliente</h4>
           {!editingClient ? (
             <button onClick={() => setEditingClient(true)} className="text-gray-400 hover:text-blue-600 transition-colors">
               <Pencil size={16} />
@@ -618,7 +618,7 @@ function ExpedientOverview({ exp, renewMutation }) {
             ].filter(([, v]) => v).map(([k, v]) => (
               <div key={k} className="flex">
                 <dt className="w-28 text-gray-500 shrink-0">{k}</dt>
-                <dd className="font-medium text-gray-900">{v}</dd>
+                <dd className="font-medium text-[var(--text-main)]">{v}</dd>
               </div>
             ))}
           </dl>
@@ -695,7 +695,7 @@ function ExpedientOverview({ exp, renewMutation }) {
 
       {/* Responsables */}
       <div className="card p-5">
-        <h4 className="font-semibold mb-3 text-gray-900">Responsables</h4>
+        <h4 className="font-semibold mb-3 text-[var(--text-main)]">Responsables</h4>
         <div className="space-y-3">
           {[
             { label: 'Comercial', user: comercial?.user },
@@ -706,7 +706,7 @@ function ExpedientOverview({ exp, renewMutation }) {
             return (
               <div key={label} className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                  user ? 'bg-blue-500' : 'bg-gray-300'
+                  user ? 'bg-[var(--sidebar-bg)]0' : 'bg-gray-300'
                 }`}>
                   {user ? user.name.charAt(0) : '?'}
                 </div>
@@ -729,20 +729,20 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Participantes */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-gray-900">Participantes</h4>
+          <h4 className="font-semibold text-[var(--text-main)]">Participantes</h4>
           <button onClick={() => setShowParticipantModal(true)} className="text-blue-600 hover:text-blue-700 transition-colors">
             <Plus size={16} />
           </button>
         </div>
         <div className="space-y-3">
           {(exp.clientRoles || []).map(role => (
-            <div key={role.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 group">
+            <div key={role.id} className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-color)] group">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-[10px] font-bold">
                   {role.role.charAt(0)}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-[var(--text-main)]">
                     {role.client.firstName || role.client.companyName} {role.client.lastName || ''}
                   </p>
                   <p className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">{role.role}</p>
@@ -754,7 +754,7 @@ function ExpedientOverview({ exp, renewMutation }) {
             </div>
           ))}
           {(exp.clientRoles || []).length === 0 && (
-            <div className="text-center py-4 border border-dashed border-gray-200 rounded-lg">
+            <div className="text-center py-4 border border-dashed border-[var(--border-color)] rounded-lg">
               <p className="text-gray-400 text-xs">Sin coparticipantes</p>
               <p className="text-[10px] text-gray-300">Vendedor 2, Representante...</p>
             </div>
@@ -765,7 +765,7 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Financiación y Comisiones */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-gray-900">Honorarios y Financiación</h4>
+          <h4 className="font-semibold text-[var(--text-main)]">Honorarios y Financiación</h4>
           {!editingInmueble ? (
             <button onClick={() => setEditingInmueble(true)} className="text-gray-400 hover:text-blue-600 transition-colors">
               <Pencil size={16} />
@@ -792,17 +792,17 @@ function ExpedientOverview({ exp, renewMutation }) {
             </div>
             <div className="flex border-t pt-2 mt-2">
               <dt className="w-32 text-gray-500">Honorarios (%)</dt>
-              <dd className="font-bold text-gray-900">{exp.commissionPercent ? `${exp.commissionPercent} %` : '—'}</dd>
+              <dd className="font-bold text-[var(--text-main)]">{exp.commissionPercent ? `${exp.commissionPercent} %` : '—'}</dd>
             </div>
             <div className="flex">
               <dt className="w-32 text-gray-500">Honorarios (€)</dt>
-              <dd className="font-bold text-gray-900">{exp.commissionFixed ? `${Number(exp.commissionFixed).toLocaleString('es-ES')} €` : '—'}</dd>
+              <dd className="font-bold text-[var(--text-main)]">{exp.commissionFixed ? `${Number(exp.commissionFixed).toLocaleString('es-ES')} €` : '—'}</dd>
             </div>
             <div className="flex pt-1 gap-4">
-              <span className={`badge text-[10px] ${exp.commissionInvoiced ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+              <span className={`badge text-[10px] ${exp.commissionInvoiced ? 'bg-green-100 text-green-700' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
                 {exp.commissionInvoiced ? 'Facturado' : 'No facturado'}
               </span>
-              <span className={`badge text-[10px] ${exp.commissionPaid ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+              <span className={`badge text-[10px] ${exp.commissionPaid ? 'bg-blue-100 text-blue-700' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
                 {exp.commissionPaid ? 'Cobrado' : 'No cobrado'}
               </span>
             </div>
@@ -844,12 +844,12 @@ function ExpedientOverview({ exp, renewMutation }) {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={inmuebleForm.commissionInvoiced} 
                   onChange={e => setInmuebleForm({ ...inmuebleForm, commissionInvoiced: e.target.checked })} />
-                <span className="text-xs text-gray-700">Facturado</span>
+                <span className="text-xs text-[var(--text-muted)]">Facturado</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={inmuebleForm.commissionPaid} 
                   onChange={e => setInmuebleForm({ ...inmuebleForm, commissionPaid: e.target.checked })} />
-                <span className="text-xs text-gray-700">Cobrado</span>
+                <span className="text-xs text-[var(--text-muted)]">Cobrado</span>
               </label>
             </div>
           </form>
@@ -859,7 +859,7 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Valoración */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-gray-900">Valoración de mercado</h4>
+          <h4 className="font-semibold text-[var(--text-main)]">Valoración de mercado</h4>
           {!editingInmueble ? (
             <button onClick={() => setEditingInmueble(true)} className="text-gray-400 hover:text-blue-600 transition-colors">
               <Pencil size={16} />
@@ -880,11 +880,11 @@ function ExpedientOverview({ exp, renewMutation }) {
           <dl className="space-y-2 text-sm">
             <div className="flex">
               <dt className="w-32 text-gray-500">Precio estimado</dt>
-              <dd className="font-bold text-gray-900">
+              <dd className="font-bold text-[var(--text-main)]">
                 {exp.valuationEstimated ? `${Number(exp.valuationEstimated).toLocaleString('es-ES')} €` : '—'}
               </dd>
             </div>
-            <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded italic">
+            <div className="mt-2 text-xs text-gray-500 bg-[var(--bg-color)] p-2 rounded italic">
               {exp.valuationMarketNotes || 'Sin notas de valoración'}
             </div>
           </dl>
@@ -907,7 +907,7 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Arras y Notaría */}
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-gray-900">
+          <h4 className="font-semibold text-[var(--text-main)]">
             {(exp.operationType === 'INQUILINO' || exp.operationType === 'PROPIETARIO') ? 'Reserva y Contrato' : 'Arras y Notaría'}
           </h4>
           {!editingInmueble ? (
@@ -976,7 +976,7 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Exclusividad */}
       {exp.exclusivityEnd && (
         <div className="card p-5">
-          <h4 className="font-semibold mb-3 text-gray-900">Exclusividad</h4>
+          <h4 className="font-semibold mb-3 text-[var(--text-main)]">Exclusividad</h4>
           <dl className="space-y-2 text-sm">
             <div className="flex">
               <dt className="w-32 text-gray-500">Inicio</dt>
@@ -1003,8 +1003,8 @@ function ExpedientOverview({ exp, renewMutation }) {
       {/* Notas */}
       {exp.notes && (
         <div className="card p-5 lg:col-span-2">
-          <h4 className="font-semibold mb-2 text-gray-900">Notas</h4>
-          <p className="text-sm text-gray-600 whitespace-pre-wrap">{exp.notes}</p>
+          <h4 className="font-semibold mb-2 text-[var(--text-main)]">Notas</h4>
+          <p className="text-sm text-[var(--text-muted)] whitespace-pre-wrap">{exp.notes}</p>
         </div>
       )}
     </div>
@@ -1024,12 +1024,12 @@ function PhaseHistoryTab({ history = [], operationType }) {
     <div className="card p-5">
       <h4 className="font-semibold mb-4">Historial de cambios de fase</h4>
       {history.length === 0 && <p className="text-gray-400 text-sm">Sin historial</p>}
-      <ol className="relative border-l border-gray-200 space-y-6">
+      <ol className="relative border-l border-[var(--border-color)] space-y-6">
         {history.map(entry => (
           <li key={entry.id} className="ml-4">
-            <div className="absolute -left-1.5 mt-1.5 w-3 h-3 rounded-full border-2 border-white bg-blue-500" />
+            <div className="absolute -left-1.5 mt-1.5 w-3 h-3 rounded-full border-2 border-white bg-[var(--sidebar-bg)]0" />
             <div className="text-sm">
-              <p className="font-medium text-gray-900">
+              <p className="font-medium text-[var(--text-main)]">
                 {entry.fromPhase
                   ? `${getLabel(entry.fromPhase)} → ${getLabel(entry.toPhase)}`
                   : `Apertura en ${getLabel(entry.toPhase)}`}
@@ -1086,7 +1086,7 @@ function VisitsPanel({ expedientId }) {
     <div className="card p-5">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="font-bold text-lg text-gray-900">Registro de Visitas</h3>
+          <h3 className="font-bold text-lg text-[var(--text-main)]">Registro de Visitas</h3>
           <p className="text-sm text-gray-500">Historial de visitas y feedback de interesados</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary">
@@ -1096,32 +1096,32 @@ function VisitsPanel({ expedientId }) {
 
       <div className="space-y-4">
         {visitsList.length === 0 && (
-          <div className="text-center py-10 border-2 border-dashed border-gray-100 rounded-xl">
+          <div className="text-center py-10 border-2 border-dashed border-[var(--border-color)] rounded-xl">
             <Users className="mx-auto text-gray-300 mb-2" size={32} />
             <p className="text-gray-400">No hay visitas registradas aún</p>
           </div>
         )}
         
         {visitsList.map(v => (
-          <div key={v.id} className="flex gap-4 p-4 rounded-xl border border-gray-100 hover:border-blue-100 hover:bg-blue-50/30 transition-all group">
+          <div key={v.id} className="flex gap-4 p-4 rounded-xl border border-[var(--border-color)] hover:border-blue-100 hover:bg-[var(--sidebar-bg)]/30 transition-all group">
             <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0 font-bold">
               {v.visitorName.charAt(0)}
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
-                <h4 className="font-bold text-gray-900">{v.visitorName}</h4>
+                <h4 className="font-bold text-[var(--text-main)]">{v.visitorName}</h4>
                 <div className="flex items-center gap-2">
                   <span className={`badge text-[10px] ${
                     v.interestLevel === 'HIGH' ? 'bg-green-100 text-green-700' :
                     v.interestLevel === 'MID' ? 'bg-blue-100 text-blue-700' :
-                    'bg-gray-100 text-gray-600'
+                    'bg-[var(--sidebar-bg)] text-[var(--text-muted)]'
                   }`}>
                     Interés {v.interestLevel}
                   </span>
                   <span className="text-xs text-gray-400">{new Date(v.date).toLocaleDateString('es-ES')}</span>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 italic">"{v.feedback || 'Sin comentarios'}"</p>
+              <p className="text-sm text-[var(--text-muted)] italic">"{v.feedback || 'Sin comentarios'}"</p>
               {v.visitorPhone && <p className="text-xs text-gray-400 mt-1">Tel: {v.visitorPhone}</p>}
             </div>
             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">
@@ -1158,7 +1158,7 @@ function VisitModal({ visit, onClose, onSubmit, isPending }) {
       <div className="card p-6 w-full max-w-md">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold text-lg">{visit ? 'Editar visita' : 'Registrar visita'}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+          <button onClick={onClose} className="text-gray-400 hover:text-[var(--text-muted)]"><X size={20} /></button>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); onSubmit(form) }} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -1225,8 +1225,8 @@ function ParticipantModal({ expedientId, onClose, onSuccess }) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
       <div className="card p-6 w-full max-w-lg">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-lg text-gray-900">Añadir Participante</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+          <h3 className="font-bold text-lg text-[var(--text-main)]">Añadir Participante</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-[var(--text-muted)]"><X size={20} /></button>
         </div>
         
         <div className="space-y-4">
@@ -1252,13 +1252,13 @@ function ParticipantModal({ expedientId, onClose, onSuccess }) {
             </div>
           </div>
 
-          <div className="max-h-60 overflow-y-auto border border-gray-100 rounded-lg">
+          <div className="max-h-60 overflow-y-auto border border-[var(--border-color)] rounded-lg">
             {isLoading && <div className="p-4 text-center text-xs text-gray-400">Buscando...</div>}
             {!isLoading && search.length > 2 && clients.length === 0 && <div className="p-4 text-center text-xs text-gray-400">No se encontraron clientes</div>}
             {clients.map(c => (
-              <div key={c.id} className="flex items-center justify-between p-3 border-b last:border-0 hover:bg-gray-50">
+              <div key={c.id} className="flex items-center justify-between p-3 border-b last:border-0 hover:bg-[var(--bg-color)]">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{c.firstName || c.companyName} {c.lastName || ''}</p>
+                  <p className="text-sm font-medium text-[var(--text-main)]">{c.firstName || c.companyName} {c.lastName || ''}</p>
                   <p className="text-[10px] text-gray-500">{c.email} · {c.phone}</p>
                 </div>
                 <button 

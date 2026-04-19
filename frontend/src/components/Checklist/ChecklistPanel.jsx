@@ -60,12 +60,12 @@ function ChecklistInstance({ instance, onToggle }) {
     <div className="card overflow-hidden">
       {/* Header */}
       <div
-        className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-gray-50"
+        className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-[var(--bg-color)]"
         onClick={() => setExpanded(e => !e)}
       >
         <div className="flex items-center gap-3">
           {expanded ? <ChevronDown size={16} className="text-gray-400" /> : <ChevronRight size={16} className="text-gray-400" />}
-          <span className="font-semibold text-gray-900">{instance.template?.name}</span>
+          <span className="font-semibold text-[var(--text-main)]">{instance.template?.name}</span>
           {instance.completedAt && (
             <span className="badge bg-green-100 text-green-700 text-xs">Completada</span>
           )}
@@ -76,13 +76,13 @@ function ChecklistInstance({ instance, onToggle }) {
           <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all ${
-                progress.percent === 100 ? 'bg-green-500' :
-                progress.percent > 50 ? 'bg-blue-500' : 'bg-yellow-400'
+                progress.percent === 100 ? 'bg-[var(--sidebar-bg)]0' :
+                progress.percent > 50 ? 'bg-[var(--sidebar-bg)]0' : 'bg-yellow-400'
               }`}
               style={{ width: `${progress.percent}%` }}
             />
           </div>
-          <span className="text-xs font-bold text-gray-600">{progress.percent}%</span>
+          <span className="text-xs font-bold text-[var(--text-muted)]">{progress.percent}%</span>
         </div>
       </div>
 
@@ -92,8 +92,8 @@ function ChecklistInstance({ instance, onToggle }) {
           {instance.items.map(item => (
             <div
               key={item.id}
-              className={`flex items-start gap-3 px-5 py-3 cursor-pointer hover:bg-gray-50 transition-colors ${
-                item.completed ? 'bg-green-50/40' : ''
+              className={`flex items-start gap-3 px-5 py-3 cursor-pointer hover:bg-[var(--bg-color)] transition-colors ${
+                item.completed ? 'bg-[var(--sidebar-bg)]/40' : ''
               }`}
               onClick={() => onToggle(item.id, !item.completed)}
             >
@@ -104,7 +104,7 @@ function ChecklistInstance({ instance, onToggle }) {
                 }
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${item.completed ? 'line-through text-gray-400' : 'text-gray-900'}`}>
+                <p className={`text-sm font-medium ${item.completed ? 'line-through text-gray-400' : 'text-[var(--text-main)]'}`}>
                   {item.label}
                   {item.required && !item.completed && (
                     <span className="ml-2 text-red-400 text-xs">*obligatorio</span>

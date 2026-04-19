@@ -59,13 +59,13 @@ export default function ExpedientsPage() {
         <div className="flex rounded-lg border border-gray-300 overflow-hidden">
           <button
             onClick={() => setView('kanban')}
-            className={`px-3 py-2 text-sm flex items-center gap-1.5 ${view === 'kanban' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+            className={`px-3 py-2 text-sm flex items-center gap-1.5 ${view === 'kanban' ? 'bg-blue-600 text-white' : 'bg-[var(--card-bg)] text-[var(--text-muted)] hover:bg-[var(--bg-color)]'}`}
           >
             <LayoutGrid size={15} /> Kanban
           </button>
           <button
             onClick={() => setView('list')}
-            className={`px-3 py-2 text-sm flex items-center gap-1.5 border-l border-gray-300 ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+            className={`px-3 py-2 text-sm flex items-center gap-1.5 border-l border-gray-300 ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-[var(--card-bg)] text-[var(--text-muted)] hover:bg-[var(--bg-color)]'}`}
           >
             <List size={15} /> Lista
           </button>

@@ -10,7 +10,7 @@ const ROLE_COLORS = {
   FIRMAS: 'bg-green-100 text-green-700',
   MARKETING: 'bg-purple-100 text-purple-700',
   DIRECCION: 'bg-orange-100 text-orange-700',
-  ADMINISTRACION: 'bg-gray-100 text-gray-700',
+  ADMINISTRACION: 'bg-[var(--sidebar-bg)] text-[var(--text-muted)]',
 }
 
 export default function UsersPage() {
@@ -38,7 +38,7 @@ export default function UsersPage() {
       <div className="card overflow-hidden">
         {isLoading ? <div className="text-center text-gray-400 py-10">Cargando...</div> : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-[var(--bg-color)] border-b border-[var(--border-color)]">
               <tr>
                 {['Nombre', 'Email', 'Rol', 'Teléfono', 'Estado', ''].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">{h}</th>
@@ -47,15 +47,15 @@ export default function UsersPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {(users || []).map(u => (
-                <tr key={u.id} className={`hover:bg-gray-50 ${!u.active ? 'opacity-50' : ''}`}>
+                <tr key={u.id} className={`hover:bg-[var(--bg-color)] ${!u.active ? 'opacity-50' : ''}`}>
                   <td className="px-4 py-3 font-medium">{u.name}</td>
-                  <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                  <td className="px-4 py-3 text-[var(--text-muted)]">{u.email}</td>
                   <td className="px-4 py-3">
-                    <span className={`badge ${ROLE_COLORS[u.role] || 'bg-gray-100'}`}>{u.role}</span>
+                    <span className={`badge ${ROLE_COLORS[u.role] || 'bg-[var(--sidebar-bg)]'}`}>{u.role}</span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{u.phone || '—'}</td>
+                  <td className="px-4 py-3 text-[var(--text-muted)]">{u.phone || '—'}</td>
                   <td className="px-4 py-3">
-                    <span className={`badge ${u.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <span className={`badge ${u.active ? 'bg-green-100 text-green-700' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
                       {u.active ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>

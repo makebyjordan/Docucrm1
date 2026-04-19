@@ -22,15 +22,21 @@ export default function Sidebar() {
   const user = useAuthStore(s => s.user)
 
   return (
-    <aside className="w-60 bg-gray-900 text-white flex flex-col shrink-0">
+    <aside 
+      style={{ backgroundColor: 'var(--sidebar-bg)' }}
+      className="w-60 flex flex-col shrink-0 transition-colors duration-300"
+    >
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-700">
-        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+      <div 
+        style={{ borderColor: 'var(--border-color)' }}
+        className="flex items-center gap-3 px-5 py-5 border-b"
+      >
+        <div style={{ backgroundColor: 'var(--primary-color)' }} className="w-8 h-8 rounded-lg flex items-center justify-center">
           <Building2 size={18} className="text-white" />
         </div>
         <div>
-          <p className="font-bold text-sm leading-tight">CRM Inmobiliaria</p>
-          <p className="text-xs text-gray-400">Gestión documental</p>
+          <p style={{ color: 'var(--sidebar-text)' }} className="font-bold text-sm leading-tight">CRM Inmobiliaria</p>
+          <p style={{ color: 'var(--sidebar-text-muted)' }} className="text-xs">Gestión documental</p>
         </div>
       </div>
 
@@ -43,12 +49,16 @@ export default function Sidebar() {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? 'shadow-lg shadow-red-500/20'
+                    : 'hover:bg-[var(--sidebar-hover)]'
                 }`
               }
+              style={({ isActive }) => ({
+                backgroundColor: isActive ? 'var(--primary-color)' : 'transparent',
+                color: isActive ? 'white' : 'var(--sidebar-text-muted)',
+              })}
             >
               <Icon size={18} />
               {label}
@@ -57,18 +67,25 @@ export default function Sidebar() {
       </nav>
 
       {/* Calendario (abajo) */}
-      <div className="px-3 pb-2 border-t border-gray-700 pt-3">
+      <div 
+        style={{ borderColor: 'var(--border-color)' }}
+        className="px-3 pb-2 border-t pt-3"
+      >
         {bottomItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'shadow-lg shadow-red-500/20'
+                  : 'hover:bg-[var(--sidebar-hover)]'
               }`
             }
+            style={({ isActive }) => ({
+              backgroundColor: isActive ? 'var(--primary-color)' : 'transparent',
+              color: isActive ? 'white' : 'var(--sidebar-text-muted)',
+            })}
           >
             <Icon size={18} />
             {label}
@@ -77,14 +94,20 @@ export default function Sidebar() {
       </div>
 
       {/* Usuario */}
-      <div className="px-4 py-4 border-t border-gray-700">
+      <div 
+        style={{ borderColor: 'var(--border-color)' }}
+        className="px-4 py-4 border-t"
+      >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-xs font-bold">
+          <div 
+            style={{ backgroundColor: 'var(--primary-color)' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+          >
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium truncate">{user?.name}</p>
-            <p className="text-xs text-gray-400 truncate">{user?.role}</p>
+            <p style={{ color: 'var(--sidebar-text)' }} className="text-sm font-medium truncate">{user?.name}</p>
+            <p style={{ color: 'var(--sidebar-text-muted)' }} className="text-xs truncate">{user?.role}</p>
           </div>
         </div>
       </div>

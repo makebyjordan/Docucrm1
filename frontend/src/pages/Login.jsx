@@ -24,15 +24,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 transition-colors duration-300" style={{ backgroundColor: 'var(--bg-color)' }}>
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div 
+            style={{ backgroundColor: 'var(--primary-color)' }}
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-500/20"
+          >
             <Building2 size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">CRM Inmobiliaria</h1>
-          <p className="text-gray-400 mt-1">Gestión documental de operaciones</p>
+          <h1 style={{ color: 'var(--text-main)' }} className="text-2xl font-bold">CRM Inmobiliaria</h1>
+          <p style={{ color: 'var(--text-muted)' }} className="mt-1">Gestión documental de operaciones</p>
         </div>
 
         {/* Form */}
