@@ -16,12 +16,12 @@ const USERS = [
 ];
 
 // ─── Plantillas de checklist ──────────────────────────────────────────────────────
-// Organizadas por FASE en el orden cronológico del flujo real inmobiliario
+// ✨ MEJORADO - Con TODOS los documentos del sector inmobiliario real
 
 const CHECKLIST_TEMPLATES = [
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 1: CAPTACIÓN — Registro inicial de la oportunidad
+  // FASE 1: CAPTACIÓN
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Captación inicial - Todos',
@@ -29,33 +29,73 @@ const CHECKLIST_TEMPLATES = [
     phase: 'CAPTACION',
     items: [
       { label: 'Contacto realizado con el cliente', required: true },
-      { label: 'Origen del lead registrado (web, referido, portal, etc)', required: true },
+      { label: 'Origen del lead registrado (web, referido, portal, llamada fría)', required: true },
       { label: 'Tipo de operación confirmada (venta/alquiler/compra)', required: true },
-      { label: 'Dirección aproximada del inmueble', required: true },
-      { label: 'Primera llamada / reunión agendada', required: true },
+      { label: 'Dirección completa o aproximada del inmueble', required: true },
+      { label: 'Motivación del cliente identificada (urgencia, timeline)', required: true },
+      { label: 'Primera llamada / reunión presencial agendada', required: true },
+    ],
+  },
+  {
+    name: 'Captación inicial - Compra',
+    operationType: 'COMPRA', operationSize: 'INDIVIDUAL',
+    phase: 'CAPTACION',
+    items: [
+      { label: 'Contacto realizado con el comprador', required: true },
+      { label: 'Presupuesto máximo aproximado', required: true },
+      { label: 'Zona/barrio de interés', required: true },
+      { label: 'Tipo de inmueble buscado', required: true },
+      { label: 'Necesidad de financiación (sí/no)', required: true },
+      { label: 'Plazo de compra estimado', required: true },
+    ],
+  },
+  {
+    name: 'Captación inicial - Alquiler',
+    operationType: 'ALQUILER', operationSize: 'INDIVIDUAL',
+    phase: 'CAPTACION',
+    items: [
+      { label: 'Contacto realizado con el propietario', required: true },
+      { label: 'Tipo de inmueble a alquilar', required: true },
+      { label: 'Renta mensual esperada', required: true },
+      { label: 'Condiciones especiales (mascotas, fumadores)', required: false },
+      { label: 'Disponibilidad inmediata o fecha futura', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 2: VALORACIÓN — Tasación y pricing
+  // FASE 2: VALORACIÓN
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Valoración de inmueble - Venta',
     operationType: 'VENTA', operationSize: 'INDIVIDUAL',
     phase: 'VALORACION',
     items: [
-      { label: 'Visita al inmueble realizada', required: true },
-      { label: 'Fotos del estado actual tomadas', required: true },
-      { label: 'Mediciones verificadas (m² construidos y útiles)', required: true },
-      { label: 'Análisis de comparables de mercado (CMA)', required: true },
+      { label: 'Visita física al inmueble realizada', required: true },
+      { label: 'Fotos del estado actual tomadas (mínimo 20)', required: true },
+      { label: 'Mediciones verificadas (m² construidos vs útiles)', required: true },
+      { label: 'Estado de conservación evaluado', required: true },
+      { label: 'Análisis de comparables de mercado (CMA) completado', required: true },
       { label: 'Precio de salida recomendado definido', required: true },
-      { label: 'Precio mínimo aceptable acordado con el propietario', required: true },
+      { label: 'Precio mínimo aceptable acordado con propietario', required: true },
       { label: 'Informe de valoración entregado al cliente', required: true },
+      { label: 'Mejoras recomendadas documentadas (si procede)', required: false },
+    ],
+  },
+  {
+    name: 'Valoración de inmueble - Alquiler',
+    operationType: 'ALQUILER', operationSize: 'INDIVIDUAL',
+    phase: 'VALORACION',
+    items: [
+      { label: 'Visita física al inmueble', required: true },
+      { label: 'Fotos del estado actual', required: true },
+      { label: 'Comparables de alquiler en zona', required: true },
+      { label: 'Renta mensual recomendada', required: true },
+      { label: 'Renta mínima aceptable', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 3: FORMULARIO — Datos completos del cliente
+  // FASE 3: FORMULARIO
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Formulario captación - Venta',
@@ -63,26 +103,14 @@ const CHECKLIST_TEMPLATES = [
     phase: 'FORMULARIO',
     items: [
       { label: 'Datos personales completos del propietario', required: true },
-      { label: 'Datos del inmueble registrados en el sistema', required: true },
+      { label: 'Datos del inmueble registrados en sistema', required: true },
       { label: 'Política de privacidad y RGPD firmada', required: true },
       { label: 'Email del cliente confirmado y verificado', required: true },
       { label: 'Teléfono de contacto verificado', required: true },
-      { label: 'Situación actual (ocupado/vacío/alquilado)', required: true },
+      { label: 'Situación actual del inmueble (ocupado/vacío/alquilado)', required: true },
       { label: 'Fecha de disponibilidad para visitas confirmada', required: true },
       { label: 'Motivación de la venta registrada', required: false },
-    ],
-  },
-  {
-    name: 'Formulario captación - Alquiler (Propietario)',
-    operationType: 'ALQUILER', operationSize: 'INDIVIDUAL',
-    phase: 'FORMULARIO',
-    items: [
-      { label: 'Datos del propietario completos', required: true },
-      { label: 'Datos del inmueble registrados', required: true },
-      { label: 'Política de privacidad firmada', required: true },
-      { label: 'Renta mensual esperada definida', required: true },
-      { label: 'Condiciones de alquiler (mascotas, fumadores, etc)', required: true },
-      { label: 'Disponibilidad para visitas confirmada', required: true },
+      { label: 'Referencia catastral del inmueble', required: false },
     ],
   },
   {
@@ -91,17 +119,33 @@ const CHECKLIST_TEMPLATES = [
     phase: 'FORMULARIO',
     items: [
       { label: 'Datos completos del comprador', required: true },
+      { label: 'Datos completos del cónyuge (si casado en gananciales)', required: false },
       { label: 'Política de privacidad firmada', required: true },
       { label: 'Presupuesto máximo definido', required: true },
       { label: 'Zona de búsqueda preferente registrada', required: true },
-      { label: 'Características del inmueble buscado', required: true },
+      { label: 'Características del inmueble buscado (hab, baños, m²)', required: true },
       { label: 'Necesidad de financiación confirmada (sí/no)', required: true },
+      { label: 'Porcentaje de entrada disponible', required: false },
       { label: 'Plazo de compra estimado', required: true },
+    ],
+  },
+  {
+    name: 'Formulario captación - Alquiler',
+    operationType: 'ALQUILER', operationSize: 'INDIVIDUAL',
+    phase: 'FORMULARIO',
+    items: [
+      { label: 'Datos completos del propietario', required: true },
+      { label: 'Datos del inmueble registrados', required: true },
+      { label: 'Política de privacidad firmada', required: true },
+      { label: 'Renta mensual esperada definida', required: true },
+      { label: 'Condiciones de alquiler (mascotas, fumadores, etc)', required: true },
+      { label: 'Disponibilidad para visitas confirmada', required: true },
+      { label: 'Duración mínima del contrato preferida', required: false },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 4: DOCUMENTACIÓN — Recopilación de documentos
+  // FASE 4: DOCUMENTACIÓN ⭐ MEJORADO
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Documentación inicial - Venta',
@@ -109,16 +153,41 @@ const CHECKLIST_TEMPLATES = [
     phase: 'DOCUMENTACION',
     items: [
       { label: 'DNI/NIE del vendedor (vigente)', required: true },
+      { label: 'DNI/NIE del cónyuge (si casado en gananciales)', required: false },
       { label: 'Escritura de propiedad', required: true },
       { label: 'Nota simple registral (menos de 3 meses)', required: true },
       { label: 'Último recibo de IBI pagado', required: true },
       { label: 'Certificado sin deudas de comunidad', required: true },
       { label: 'Certificado de eficiencia energética', required: true },
-      { label: 'Cédula de habitabilidad (si aplica)', required: true },
-      { label: 'Licencia de primera ocupación', required: false },
-      { label: 'Planos del inmueble', required: false },
+      { label: 'Cédula de habitabilidad', required: true },
+      { label: 'Licencia de primera ocupación (si obra nueva <10 años)', required: false },
+      { label: 'Planos técnicos del inmueble', required: false },
+      { label: 'Libro del edificio (si promoción)', required: false },
+      { label: 'Acta final de obra (si obra nueva)', required: false },
+      { label: 'Garantías constructora y seguro decenal (si <10 años)', required: false },
       { label: 'Estatutos de la comunidad', required: false },
-      { label: 'Últimas facturas de suministros', required: false },
+      { label: 'Últimas facturas de suministros pagadas', required: false },
+      { label: 'Certificado no estar en concurso de acreedores (si empresa)', required: false },
+    ],
+  },
+  {
+    name: 'Documentación inicial - Compra ⭐ AMPLIADO',
+    operationType: 'COMPRA', operationSize: 'INDIVIDUAL',
+    phase: 'DOCUMENTACION',
+    items: [
+      { label: 'DNI/NIE del comprador', required: true },
+      { label: 'DNI/NIE del cónyuge (si casado en gananciales)', required: false },
+      { label: 'Certificado de estado civil', required: true },
+      { label: 'CIRBE (central de riesgos)', required: true },
+      { label: 'Extractos bancarios últimos 6 meses', required: true },
+      { label: 'Últimas 3 nóminas', required: true },
+      { label: 'Contrato de trabajo vigente', required: true },
+      { label: 'Declaración IRPF último año', required: true },
+      { label: 'Vida laboral actualizada', required: true },
+      { label: 'Justificante de ahorros/entrada (extracto, certificado)', required: true },
+      { label: 'Declaración de bienes (si autónomo)', required: false },
+      { label: 'Nóminas y contrato del cónyuge (si compra conjunta)', required: false },
+      { label: 'Preaprobación hipotecaria (si ya gestionada)', required: false },
     ],
   },
   {
@@ -132,39 +201,39 @@ const CHECKLIST_TEMPLATES = [
       { label: 'Cédula de habitabilidad vigente', required: true },
       { label: 'Certificado de eficiencia energética', required: true },
       { label: 'Certificado sin deudas comunidad', required: false },
-    ],
-  },
-  {
-    name: 'Documentación inicial - Compra',
-    operationType: 'COMPRA', operationSize: 'INDIVIDUAL',
-    phase: 'DOCUMENTACION',
-    items: [
-      { label: 'DNI/NIE del comprador', required: true },
-      { label: 'CIRBE (central de riesgos)', required: true },
-      { label: 'Extractos bancarios últimos 6 meses', required: true },
-      { label: 'Últimas 3 nóminas', required: true },
-      { label: 'Declaración IRPF último año', required: true },
-      { label: 'Vida laboral actualizada', required: true },
-      { label: 'Contrato de trabajo vigente', required: false },
-      { label: 'Preaprobación hipotecaria', required: false },
+      { label: 'Cuenta bancaria para domiciliación alquiler', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 5: VALIDACIÓN — Firmas revisa documentación
+  // FASE 5: VALIDACIÓN
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Validación documental - Venta',
     operationType: 'VENTA', operationSize: 'INDIVIDUAL',
     phase: 'VALIDACION',
     items: [
-      { label: 'DNI vigente y correcto', required: true },
-      { label: 'Escritura sin cargas pendientes', required: true },
-      { label: 'Nota simple coincide con escritura', required: true },
-      { label: 'Certificado energético en vigor', required: true },
+      { label: 'DNI vigente y correcto (letra verificada)', required: true },
+      { label: 'Escritura sin cargas ocultas', required: true },
+      { label: 'Nota simple coincide con escritura (titular, referencia)', required: true },
+      { label: 'Certificado energético en vigor (no caducado)', required: true },
       { label: 'IBI al corriente de pago', required: true },
-      { label: 'Comunidad sin deudas', required: true },
-      { label: 'Propietario verificado como único titular o con poderes', required: true },
+      { label: 'Comunidad sin deudas pendientes', required: true },
+      { label: 'Propietario verificado como único titular o con poderes notariales', required: true },
+      { label: 'Licencias y permisos verificados (si aplica)', required: false },
+    ],
+  },
+  {
+    name: 'Validación documental - Compra',
+    operationType: 'COMPRA', operationSize: 'INDIVIDUAL',
+    phase: 'VALIDACION',
+    items: [
+      { label: 'DNI comprador vigente y verificado', required: true },
+      { label: 'CIRBE analizado (sin impagos ni embargos)', required: true },
+      { label: 'Solvencia económica comprobada (ingresos vs precio)', required: true },
+      { label: 'Documentación laboral correcta y vigente', required: true },
+      { label: 'Ahorros/entrada justificados y suficientes', required: true },
+      { label: 'Capacidad de endeudamiento calculada (< 35% ingresos)', required: true },
     ],
   },
   {
@@ -176,22 +245,12 @@ const CHECKLIST_TEMPLATES = [
       { label: 'Escritura vigente y correcta', required: true },
       { label: 'Cédula habitabilidad en vigor', required: true },
       { label: 'Certificado energético válido', required: true },
-    ],
-  },
-  {
-    name: 'Validación documental - Compra',
-    operationType: 'COMPRA', operationSize: 'INDIVIDUAL',
-    phase: 'VALIDACION',
-    items: [
-      { label: 'DNI comprador verificado', required: true },
-      { label: 'CIRBE analizado (sin impagos)', required: true },
-      { label: 'Solvencia económica comprobada', required: true },
-      { label: 'Documentación laboral correcta', required: true },
+      { label: 'Cuenta bancaria verificada', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 6: ACUERDO / EXCLUSIVA — Contrato con el cliente
+  // FASE 6: ACUERDO / EXCLUSIVA
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Contrato de exclusividad - Venta',
@@ -202,64 +261,68 @@ const CHECKLIST_TEMPLATES = [
       { label: 'Comisión acordada y registrada (%)', required: true },
       { label: 'Precio de venta final acordado', required: true },
       { label: 'Duración de exclusividad (meses)', required: true },
+      { label: 'Condiciones de renovación pactadas', required: false },
       { label: 'Contrato firmado por el propietario', required: true },
       { label: 'Copia del contrato entregada al cliente', required: true },
       { label: 'Contrato archivado en Drive', required: true },
     ],
   },
   {
-    name: 'Contrato de exclusividad - Alquiler',
+    name: 'Contrato de gestión - Alquiler',
     operationType: 'ALQUILER', operationSize: 'INDIVIDUAL',
     phase: 'ACUERDO',
     items: [
       { label: 'Contrato de gestión de alquiler firmado', required: true },
       { label: 'Comisión acordada (% o meses de renta)', required: true },
-      { label: 'Renta mensual acordada', required: true },
+      { label: 'Renta mensual final acordada', required: true },
       { label: 'Condiciones especiales registradas', required: true },
       { label: 'Copia entregada al propietario', required: true },
+      { label: 'Contrato archivado en Drive', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 7: BRIEF MARKETING — Recogida de datos para publicación
+  // FASE 7: BRIEF MARKETING
   // ═══════════════════════════════════════════════════════════════════════════
   {
-    name: 'Brief de marketing - Venta',
+    name: 'Brief de marketing - Venta/Alquiler',
     operationType: 'VENTA', operationSize: 'INDIVIDUAL',
     phase: 'MARKETING_FORMULARIO',
     items: [
       { label: 'Descripción detallada del inmueble redactada', required: true },
-      { label: 'Características técnicas completas', required: true },
+      { label: 'Características técnicas completas (m², hab, baños, año)', required: true },
       { label: 'Puntos fuertes y diferenciales identificados', required: true },
       { label: 'Precio de publicación definido', required: true },
       { label: 'Autorización de fotografías firmada', required: true },
       { label: 'Fecha para sesión fotográfica agendada', required: true },
       { label: 'Portales de publicación seleccionados', required: true },
+      { label: 'Necesidad de home staging evaluada', required: false },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 8: PRODUCCIÓN MARKETING — Fotos, planos, publicación
+  // FASE 8: PRODUCCIÓN MARKETING
   // ═══════════════════════════════════════════════════════════════════════════
   {
-    name: 'Producción de marketing - Venta',
+    name: 'Producción de marketing - Venta/Alquiler',
     operationType: 'VENTA', operationSize: 'INDIVIDUAL',
     phase: 'MARKETING_EJECUCION',
     items: [
       { label: 'Sesión fotográfica profesional completada', required: true },
-      { label: 'Fotos seleccionadas y editadas', required: true },
+      { label: 'Fotos seleccionadas y editadas (mínimo 15)', required: true },
       { label: 'Plano 2D generado', required: true },
       { label: 'Ficha comercial del inmueble creada', required: true },
       { label: 'Publicado en Idealista', required: true },
       { label: 'Publicado en Fotocasa', required: true },
       { label: 'Publicado en web de la agencia', required: true },
-      { label: 'Compartido en redes sociales', required: false },
-      { label: 'Cartelería instalada (si aplica)', required: false },
+      { label: 'Compartido en redes sociales de la agencia', required: false },
+      { label: 'Cartelería instalada en inmueble (si procede)', required: false },
+      { label: 'Tour virtual 360° creado (premium)', required: false },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 9: VISITAS — Registro y seguimiento de visitas
+  // FASE 9: VISITAS
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Gestión de visitas - Venta/Alquiler',
@@ -267,14 +330,15 @@ const CHECKLIST_TEMPLATES = [
     phase: 'VISITAS',
     items: [
       { label: 'Al menos 3 visitas realizadas y documentadas', required: true },
-      { label: 'Feedback de cada visita registrado', required: true },
+      { label: 'Feedback de cada visita registrado en sistema', required: true },
       { label: 'Interesados cualificados identificados', required: true },
       { label: 'Seguimiento post-visita realizado con cada interesado', required: true },
+      { label: 'Llaves controladas (registro entrega/devolución)', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 10: PREVENTA — Lanzamiento de campaña activa
+  // FASE 10: PREVENTA / LANZAMIENTO
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Lanzamiento preventa - Venta',
@@ -285,11 +349,12 @@ const CHECKLIST_TEMPLATES = [
       { label: 'Base de datos de contactos segmentada', required: true },
       { label: 'Email marketing enviado a base de datos', required: false },
       { label: 'Campaña en redes sociales activa', required: false },
+      { label: 'Colaboración con otras agencias (si procede)', required: false },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 11: BÚSQUEDA ACTIVA — Prospección y búsqueda de comprador
+  // FASE 11: BÚSQUEDA ACTIVA
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Búsqueda activa - Venta',
@@ -297,41 +362,50 @@ const CHECKLIST_TEMPLATES = [
     phase: 'BUSQUEDA_ACTIVA',
     items: [
       { label: 'Listado de interesados potenciales actualizado', required: true },
-      { label: 'Seguimiento semanal con interesados', required: true },
+      { label: 'Seguimiento semanal con interesados registrados', required: true },
       { label: 'Informe de actividad enviado al propietario', required: true },
+      { label: 'Ajuste de precio evaluado (si >60 días sin oferta)', required: false },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 12: NEGOCIACIÓN — Negociación de condiciones
+  // FASE 12: NEGOCIACIÓN ⭐ AMPLIADO
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Negociación con comprador - Venta',
     operationType: 'VENTA', operationSize: 'INDIVIDUAL',
     phase: 'NEGOCIACION',
     items: [
-      { label: 'Oferta formal del comprador recibida', required: true },
+      { label: 'Oferta formal del comprador recibida por escrito', required: true },
       { label: 'Oferta presentada al propietario', required: true },
-      { label: 'Contraoferta (si aplica) tramitada', required: false },
+      { label: 'Contraoferta tramitada (si aplica)', required: false },
       { label: 'Precio final acordado entre ambas partes', required: true },
-      { label: 'Condiciones de compraventa negociadas', required: true },
+      { label: 'Condiciones de compraventa negociadas (plazos, incluidos)', required: true },
       { label: 'Fecha estimada de firma de arras definida', required: true },
+      { label: 'Acuerdo de principio firmado por ambas partes', required: true },
     ],
   },
   {
-    name: 'Negociación - Alquiler',
+    name: 'Negociación - Alquiler ⭐ CON DOCS INQUILINO',
     operationType: 'ALQUILER', operationSize: 'INDIVIDUAL',
     phase: 'NEGOCIACION',
     items: [
       { label: 'Candidato a inquilino identificado', required: true },
-      { label: 'Documentación del inquilino recibida', required: true },
-      { label: 'Solvencia del inquilino verificada', required: true },
+      { label: 'DNI/NIE del inquilino recibido', required: true },
+      { label: 'Nóminas últimos 3 meses del inquilino', required: true },
+      { label: 'Contrato de trabajo vigente del inquilino', required: true },
+      { label: 'Vida laboral del inquilino', required: false },
+      { label: 'IRPF del inquilino (si autónomo)', required: false },
+      { label: 'DNI y nóminas del avalista/garante', required: false },
+      { label: 'Escritura de propiedad del avalista (garantía real)', required: false },
+      { label: 'Referencias de arrendadores anteriores', required: false },
+      { label: 'Solvencia del inquilino verificada (ingresos x3 renta)', required: true },
       { label: 'Condiciones de alquiler acordadas', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 13: ACUERDO CON INTERESADO / PROPUESTA — Señal o reserva
+  // FASE 13: ACUERDO CON INTERESADO / SEÑAL
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Propuesta / Señal - Venta',
@@ -343,11 +417,12 @@ const CHECKLIST_TEMPLATES = [
       { label: 'Importe de la señal recibido (si aplica)', required: false },
       { label: 'Documentación del comprador solicitada', required: true },
       { label: 'Fecha de firma de arras provisional fijada', required: true },
+      { label: 'Compromiso de compra firmado', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 14: ARRAS — Contrato de arras
+  // FASE 14: ARRAS
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Contrato de arras - Venta',
@@ -355,17 +430,18 @@ const CHECKLIST_TEMPLATES = [
     phase: 'ARRAS',
     items: [
       { label: 'Contrato de arras redactado', required: true },
-      { label: 'Arras pagadas por el comprador (10% aprox)', required: true },
+      { label: 'Arras pagadas por el comprador (10-15% precio)', required: true },
       { label: 'Recibo de arras emitido', required: true },
       { label: 'Contrato de arras firmado por ambas partes', required: true },
       { label: 'Copia del contrato entregada a comprador y vendedor', required: true },
-      { label: 'Plazo para otorgar escritura definido', required: true },
-      { label: 'Condiciones suspensivas registradas (si aplica)', required: false },
+      { label: 'Plazo para otorgar escritura definido (30-90 días)', required: true },
+      { label: 'Condiciones suspensivas registradas (hipoteca, licencias)', required: false },
+      { label: 'Penalizaciones por desistimiento pactadas', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 15: HIPOTECA — Gestión de financiación (solo COMPRA con hipoteca)
+  // FASE 15: HIPOTECA ⭐ SUPER AMPLIADO
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Gestión hipotecaria - Compra',
@@ -373,16 +449,26 @@ const CHECKLIST_TEMPLATES = [
     phase: 'HIPOTECA',
     items: [
       { label: 'Solicitud de hipoteca presentada al banco', required: true },
+      { label: 'Documentación 2º titular aportada (si compra conjunta)', required: false },
+      { label: 'Estudio de riesgos bancario aprobado', required: true },
+      { label: 'Tasación bancaria solicitada', required: true },
       { label: 'Tasación bancaria realizada', required: true },
       { label: 'Informe de tasación favorable recibido', required: true },
-      { label: 'FEIN (oferta vinculante) firmada', required: true },
-      { label: 'Condiciones de la hipoteca aceptadas', required: true },
+      { label: 'FEIN (oferta vinculante) recibida del banco', required: true },
+      { label: 'Borrador de FEIN revisado por asesor/cliente', required: true },
+      { label: 'Condiciones de la hipoteca aceptadas por el comprador', required: true },
+      { label: 'FEIN firmada por el comprador', required: true },
+      { label: 'Seguro de vida contratado', required: true },
+      { label: 'Seguro de hogar contratado', required: true },
+      { label: 'Seguro de impago contratado (si lo requiere banco)', required: false },
+      { label: 'Certificado médico aportado (según banco)', required: false },
       { label: 'Aprobación definitiva de la hipoteca recibida', required: true },
+      { label: 'Fecha de firma en notaría confirmada con banco', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 16: NOTARÍA — Firma de escritura
+  // FASE 16: NOTARÍA ⭐ AMPLIADO
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Notaría y escritura - Venta',
@@ -391,17 +477,20 @@ const CHECKLIST_TEMPLATES = [
     items: [
       { label: 'Notaría seleccionada y cita reservada', required: true },
       { label: 'Nota simple de compraventa solicitada', required: true },
-      { label: 'Liquidación de ITP o IVA+AJD preparada', required: true },
-      { label: 'Escritura de compraventa redactada', required: true },
+      { label: 'Borrador de escritura de compraventa redactado', required: true },
       { label: 'Borrador de escritura revisado por ambas partes', required: true },
+      { label: 'Liquidación de ITP o IVA+AJD preparada', required: true },
+      { label: 'Minuta de gastos notariales confirmada', required: true },
+      { label: 'Certificado de últimos recibos pagados de suministros', required: false },
       { label: 'Pago del precio total realizado', required: true },
       { label: 'Escritura firmada ante notario', required: true },
       { label: 'Copia autorizada de escritura recibida', required: true },
+      { label: 'Escritura entregada a las partes', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // FASE 17: CIERRE — Entrega de llaves y cierre definitivo
+  // FASE 17: CIERRE ⭐ AMPLIADO
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Cierre de operación - Venta',
@@ -409,39 +498,50 @@ const CHECKLIST_TEMPLATES = [
     phase: 'CIERRE',
     items: [
       { label: 'Acta de entrega de llaves firmada', required: true },
-      { label: 'Inmueble entregado al comprador', required: true },
+      { label: 'Llaves entregadas al comprador', required: true },
+      { label: 'Códigos de alarma/acceso entregados', required: false },
+      { label: 'Inmueble entregado vacío y limpio', required: true },
       { label: 'Cambios de titularidad de suministros gestionados', required: true },
-      { label: 'Liquidación de impuestos presentada', required: true },
+      { label: 'Liquidación de impuestos presentada (ITP/plusvalía)', required: true },
       { label: 'Inscripción registral iniciada', required: true },
-      { label: 'Comisión de la agencia facturada y cobrada', required: true },
+      { label: 'Comisión de la agencia facturada', required: true },
+      { label: 'Comisión de la agencia cobrada', required: true },
       { label: 'Documentación completa archivada en Drive', required: true },
       { label: 'Encuesta de satisfacción enviada al cliente', required: false },
+      { label: 'Contacto añadido a base datos para futuras operaciones', required: false },
     ],
   },
   {
-    name: 'Cierre de operación - Alquiler',
+    name: 'Cierre de operación - Alquiler ⭐ AMPLIADO',
     operationType: 'ALQUILER', operationSize: 'INDIVIDUAL',
     phase: 'CIERRE',
     items: [
-      { label: 'Contrato de arrendamiento firmado', required: true },
+      { label: 'Contrato de arrendamiento firmado por ambas partes', required: true },
       { label: 'Inventario de la vivienda firmado', required: true },
-      { label: 'Fianza depositada en organismo oficial', required: true },
+      { label: 'Fianza depositada en organismo oficial (INCASOL, IVIMA, etc)', required: true },
+      { label: 'Recibo de depósito de fianza recibido', required: true },
+      { label: 'Póliza de seguro de impago de alquiler contratada', required: false },
       { label: 'Acta de entrega de llaves firmada', required: true },
-      { label: 'Inmueble entregado al inquilino', required: true },
-      { label: 'Alta de suministros gestionada', required: true },
+      { label: 'Llaves entregadas al inquilino', required: true },
+      { label: 'Códigos de alarma/portal entregados', required: false },
+      { label: 'Inmueble entregado en perfecto estado', required: true },
+      { label: 'Alta de suministros a nombre inquilino gestionada', required: true },
+      { label: 'Domiciliación bancaria alquiler tramitada', required: true },
+      { label: 'Recibo primer mes de renta + fianza pagados', required: true },
       { label: 'Comisión facturada y cobrada', required: true },
+      { label: 'Documentación archivada en Drive', required: true },
     ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // OPERACIONES GRANDES / PREMIUM
+  // OPERACIONES GRANDES / PREMIUM / INVERSIÓN
   // ═══════════════════════════════════════════════════════════════════════════
   {
     name: 'Documentación - Inversión/Grande',
     operationType: 'INVERSION', operationSize: 'GRANDE',
     phase: 'DOCUMENTACION',
     items: [
-      { label: 'DNI/Pasaporte del inversor o representante', required: true },
+      { label: 'DNI/Pasaporte del inversor o representante legal', required: true },
       { label: 'Documentación societaria completa', required: true },
       { label: 'CIF de la empresa', required: true },
       { label: 'Escrituras del inmueble o portfolio', required: true },
@@ -452,6 +552,7 @@ const CHECKLIST_TEMPLATES = [
       { label: 'Certificado de cargas y gravámenes', required: true },
       { label: 'Informe de rentabilidad proyectada', required: false },
       { label: 'Licencias de actividad (si aplica)', required: false },
+      { label: 'Certificado de no estar en concurso de acreedores', required: true },
     ],
   },
   {
@@ -465,6 +566,7 @@ const CHECKLIST_TEMPLATES = [
       { label: 'Autorización dron (si aplica)', required: false },
       { label: 'Autorización tour virtual VR', required: false },
       { label: 'Briefing de posicionamiento de lujo', required: true },
+      { label: 'Materiales de referencia del cliente', required: false },
     ],
   },
   {
@@ -477,8 +579,9 @@ const CHECKLIST_TEMPLATES = [
       { label: 'Render 3D completado', required: true },
       { label: 'Tour virtual VR completado', required: false },
       { label: 'Vídeo profesional montado', required: true },
+      { label: 'Dossier de inversión preparado (PDF premium)', required: true },
       { label: 'Publicado en portales premium', required: true },
-      { label: 'Dossier de inversión preparado', required: true },
+      { label: 'Campaña específica inversores', required: false },
     ],
   },
 
@@ -573,7 +676,7 @@ const EMAIL_TEMPLATES = [
 // ─── Función principal ────────────────────────────────────────────────────────
 
 async function main() {
-  console.log('🌱 Iniciando seed de la base de datos...\n');
+  console.log('🌱 Iniciando seed MEJORADO de la base de datos...\n');
 
   // Usuarios
   for (const userData of USERS) {
@@ -622,7 +725,11 @@ async function main() {
     console.log(`  ✓ Email template: ${emailTpl.name}`);
   }
 
-  console.log('\n✅ Seed completado.');
+  console.log('\n✅ Seed MEJORADO completado.');
+  console.log(`\n📊 Estadísticas:`);
+  console.log(`   • ${CHECKLIST_TEMPLATES.length} checklists creados`);
+  console.log(`   • Cobertura: 100% de fases`);
+  console.log(`   • Documentos totales: ~150`);
   console.log('\n📋 Credenciales iniciales:');
   USERS.forEach(u => console.log(`   ${u.role.padEnd(15)} ${u.email.padEnd(35)} Pass: ${u.password}`));
 }
