@@ -66,6 +66,42 @@ const INQUILINO_TRANSITIONS = {
   POSVENTA:              { next: 'CERRADO' },
 };
 
+/**
+ * Transiciones específicas para PROPIETARIO (Alquiler).
+ * Flujo: Captación → Valoración → Formulario → Documentación → Acuerdo → Marketing (Brief) → Mkt (Ejecución) → Visitas → Negociación → Cierre → Posventa
+ * Excluye fases de venta: Preventa, Búsqueda, Arras, Hipoteca, Notaría
+ */
+const PROPIETARIO_TRANSITIONS = {
+  CAPTACION:             { next: 'VALORACION' },
+  VALORACION:            { next: 'FORMULARIO' },
+  FORMULARIO:            { next: 'DOCUMENTACION' },
+  DOCUMENTACION:         { next: 'ACUERDO' },
+  ACUERDO:               { next: 'MARKETING_FORMULARIO' },
+  MARKETING_FORMULARIO:  { next: 'MARKETING_EJECUCION' },
+  MARKETING_EJECUCION:   { next: 'VISITAS' },
+  VISITAS:               { next: 'NEGOCIACION' },
+  NEGOCIACION:           { next: 'CIERRE' },
+  CIERRE:                { next: 'POSVENTA' },
+  POSVENTA:              { next: 'CERRADO' },
+};
+
+/**
+ * Transiciones específicas para INVERSION_HOLDERS (Inversores).
+ * Flujo: Captación (Perfilado) → Formulario (Criterios) → Documentación (KYC) → Búsqueda Activa → Valoración (Análisis ROI) → Visitas → Negociación (Oferta) → Arras → Cierre → Posventa
+ */
+const INVERSION_TRANSITIONS = {
+  CAPTACION:             { next: 'FORMULARIO' },
+  FORMULARIO:            { next: 'DOCUMENTACION' },
+  DOCUMENTACION:         { next: 'BUSQUEDA_ACTIVA' },
+  BUSQUEDA_ACTIVA:       { next: 'VALORACION' },
+  VALORACION:            { next: 'VISITAS' },
+  VISITAS:               { next: 'NEGOCIACION' },
+  NEGOCIACION:           { next: 'ARRAS' },
+  ARRAS:                 { next: 'CIERRE' },
+  CIERRE:                { next: 'POSVENTA' },
+  POSVENTA:              { next: 'CERRADO' },
+};
+
 const PHASE_LABELS = {
   CAPTACION: 'Captación',
   VALORACION: 'Valoración',
@@ -92,7 +128,7 @@ const PHASE_LABELS = {
  * Determina la siguiente fase basada en el contexto del expediente.
  */
 function getNextPhase(expedient, currentPhase, decision) {
-  // INQUILINO tiene su propio mapa de transiciones
+  // 1. INQUILINO tiene su propio mapa de transiciones
   if (expedient.operationType === 'INQUILINO') {
     const transition = INQUILINO_TRANSITIONS[currentPhase];
     if (!transition) return null;
@@ -100,6 +136,20 @@ function getNextPhase(expedient, currentPhase, decision) {
       if (!decision) return null; // Necesita decisión
       return decision === 'NO' ? transition.onNo : transition.next;
     }
+    return transition.next;
+  }
+
+  // 2. PROPIETARIO (Alquiler) tiene su propio mapa
+  if (expedient.operationType === 'PROPIETARIO') {
+    const transition = PROPIETARIO_TRANSITIONS[currentPhase];
+    if (!transition) return null;
+    return transition.next;
+  }
+
+  // 3. INVERSION_HOLDERS
+  if (expedient.operationType === 'INVERSION_HOLDERS') {
+    const transition = INVERSION_TRANSITIONS[currentPhase];
+    if (!transition) return null;
     return transition.next;
   }
 
@@ -136,8 +186,13 @@ function getNextPhase(expedient, currentPhase, decision) {
  */
 async function advance(expedient, user, notes, decision) {
   const currentPhase = expedient.currentPhase;
-  const isInquilino = expedient.operationType === 'INQUILINO';
-  const transitionMap = isInquilino ? INQUILINO_TRANSITIONS : TRANSITIONS;
+  const { operationType } = expedient;
+  
+  let transitionMap = TRANSITIONS;
+  if (operationType === 'INQUILINO') transitionMap = INQUILINO_TRANSITIONS;
+  if (operationType === 'PROPIETARIO') transitionMap = PROPIETARIO_TRANSITIONS;
+  if (operationType === 'INVERSION_HOLDERS') transitionMap = INVERSION_TRANSITIONS;
+
   const transition = transitionMap[currentPhase];
 
   if (!transition) {

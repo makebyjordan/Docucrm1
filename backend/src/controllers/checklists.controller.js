@@ -13,7 +13,7 @@ async function listTemplates(req, res) {
   const templates = await prisma.checklistTemplate.findMany({
     where,
     include: { items: { orderBy: { order: 'asc' } } },
-    orderBy: { operationType: 'asc' },
+    orderBy: { order: 'asc' },
   });
   res.json(templates);
 }
@@ -32,11 +32,65 @@ async function createTemplate(req, res) {
 
 async function updateTemplate(req, res) {
   const { items, ...data } = req.body;
+  const templateId = req.params.id;
+
+  // Actualizar datos básicos
   const template = await prisma.checklistTemplate.update({
-    where: { id: req.params.id },
+    where: { id: templateId },
     data,
   });
-  res.json(template);
+
+  // Si vienen items, sincronizarlos
+  if (items) {
+    // 1. Obtener IDs actuales para saber cuáles borrar
+    const currentItems = await prisma.checklistTemplateItem.findMany({
+      where: { templateId },
+      select: { id: true },
+    });
+    const currentIds = currentItems.map(i => i.id);
+    const newIds = items.map(i => i.id).filter(Boolean);
+    const toDelete = currentIds.filter(id => !newIds.includes(id));
+
+    // 2. Borrar eliminados
+    if (toDelete.length > 0) {
+      await prisma.checklistTemplateItem.deleteMany({
+        where: { id: { in: toDelete } },
+      });
+    }
+
+    // 3. Upsert de los nuevos/editados
+    for (const [index, item] of items.entries()) {
+      if (item.id && currentIds.includes(item.id)) {
+        await prisma.checklistTemplateItem.update({
+          where: { id: item.id },
+          data: { label: item.label, required: item.required, order: index },
+        });
+      } else {
+        await prisma.checklistTemplateItem.create({
+          data: {
+            templateId,
+            label: item.label,
+            required: item.required,
+            order: index,
+          },
+        });
+      }
+    }
+  }
+
+  const updated = await prisma.checklistTemplate.findUnique({
+    where: { id: templateId },
+    include: { items: { orderBy: { order: 'asc' } } },
+  });
+
+  res.json(updated);
+}
+
+async function deleteTemplate(req, res) {
+  await prisma.checklistTemplate.delete({
+    where: { id: req.params.id },
+  });
+  res.json({ success: true });
 }
 
 async function listByExpedient(req, res) {
@@ -124,8 +178,22 @@ async function completeChecklist(req, res) {
   res.json(instance);
 }
 
+async function bulkUpdateOrder(req, res) {
+  const { templates } = req.body; // Array de { id, order }
+
+  const updates = templates.map(t => 
+    prisma.checklistTemplate.update({
+      where: { id: t.id },
+      data: { order: t.order }
+    })
+  );
+
+  await prisma.$transaction(updates);
+  res.json({ success: true });
+}
+
 module.exports = {
-  listTemplates, createTemplate, updateTemplate,
+  listTemplates, createTemplate, updateTemplate, deleteTemplate, bulkUpdateOrder,
   listByExpedient, generateForExpedient,
   updateItem, completeChecklist,
 };

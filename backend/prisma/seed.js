@@ -756,6 +756,294 @@ const CHECKLIST_TEMPLATES = [
     ],
   },
 
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🏢 PROCESO COMPLETO DEL PROPIETARIO (ALQUILER)
+  // Flujo: Captación → Valoración → Ficha → Docs → Mandato → Marketing → Visitas → Contrato → Gestión
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // FASE 1 PROPIETARIO: CAPTACIÓN
+  {
+    name: 'Captación de propiedad - Alquiler',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'CAPTACION',
+    items: [
+      { label: 'Reunión inicial con el propietario realizada', required: true },
+      { label: 'Ubicación exacta del inmueble confirmada', required: true },
+      { label: 'Motivación del alquiler identificada', required: true },
+      { label: 'Expectativas de renta mensual anotadas', required: true },
+      { label: 'Estado general del inmueble inspeccionado', required: true },
+    ],
+  },
+
+  // FASE 2 PROPIETARIO: VALORACIÓN
+  {
+    name: 'Valoración y precio - Alquiler',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'VALORACION',
+    items: [
+      { label: 'Análisis comparativo de mercado (ACM) realizado', required: true },
+      { label: 'Precio de renta mensual recomendado definido', required: true },
+      { label: 'Precio mínimo aceptable por el propietario acordado', required: true },
+      { label: 'Estrategia de comercialización presentada', required: true },
+    ],
+  },
+
+  // FASE 3 PROPIETARIO: FORMULARIO (Ficha propiedad)
+  {
+    name: 'Ficha técnica de propiedad',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'FORMULARIO',
+    items: [
+      { label: 'Superficie m2 útiles y construidos verificada', required: true },
+      { label: 'Número de habitaciones y baños verificado', required: true },
+      { label: 'Equipamiento/Muebles detallados', required: true },
+      { label: 'Características comunidad (piscina, gastos) registradas', required: true },
+      { label: 'Disponibilidad de garaje y trastero confirmada', required: true },
+    ],
+  },
+
+  // FASE 4 PROPIETARIO: DOCUMENTACIÓN
+  {
+    name: 'Documentación legal del inmueble',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'DOCUMENTACION',
+    items: [
+      { label: 'DNI / NIE / CIF del titular recibido', required: true },
+      { label: 'Escritura de propiedad recibida', required: true },
+      { label: 'Nota Simple informativa recibida (< 3 meses)', required: true },
+      { label: 'Último recibo IBI recibido', required: true },
+      { label: 'Certificado Eficiencia Energética (CEE) vigente recibido', required: true },
+      { label: 'Cédula de Habitabilidad vigente recibida', required: true },
+      { label: 'Últimos recibos de suministros (Luz, Agua, Gas)', required: true },
+    ],
+  },
+
+  // FASE 5 PROPIETARIO: ACUERDO (Mandato)
+  {
+    name: 'Mandato de gestión y llaves',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'ACUERDO',
+    items: [
+      { label: 'Mandato de alquiler / Exclusiva firmado', required: true },
+      { label: 'Hoja de encargo de servicios de la agencia firmada', required: true },
+      { label: 'Resguardo de entrega de llaves firmado', required: true },
+      { label: 'Juego de llaves completo en oficina', required: true },
+    ],
+  },
+
+  // FASE 6 PROPIETARIO: MARKETING BRIEF
+  {
+    name: 'Plan de marketing - Propiedad',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'MARKETING_FORMULARIO',
+    items: [
+      { label: 'Puntos fuertes del inmueble identificados', required: true },
+      { label: 'Perfil de inquilino ideal definido con propietario', required: true },
+      { label: 'Cláusulas especiales (mascotas/fumadores) definidas', required: true },
+    ],
+  },
+
+  // FASE 7 PROPIETARIO: MARKETING EJECUCIÓN
+  {
+    name: 'Producción y anuncios - Propiedad',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'MARKETING_EJECUCION',
+    items: [
+      { label: 'Reportaje fotográfico profesional realizado', required: true },
+      { label: 'Video / Tour virtual realizado', required: false },
+      { label: 'Anuncio redactado y aprobado por propietario', required: true },
+      { label: 'Publicación en portales inmobiliarios realizada', required: true },
+      { label: 'Cartel de alquiler colocado (si procede)', required: false },
+    ],
+  },
+
+  // FASE 8 PROPIETARIO: VISITAS
+  {
+    name: 'Gestión de visitas y filtrado',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'VISITAS',
+    items: [
+      { label: 'Hojas de visita firmadas por candidatos', required: true },
+      { label: 'Feedback de visitas enviado periódicamente al propietario', required: true },
+      { label: 'Candidatos con perfil de riesgo descartados', required: true },
+    ],
+  },
+
+  // FASE 9 PROPIETARIO: NEGOCIACIÓN / SELECCIÓN
+  {
+    name: 'Selección de inquilino y negociación',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'NEGOCIACION',
+    items: [
+      { label: 'Dossier de solvencia del candidato presentado al propietario', required: true },
+      { label: 'Aceptación formal del candidato por el propietario', required: true },
+      { label: 'Condiciones definitivas del contrato validadas por ambas partes', required: true },
+    ],
+  },
+
+  // FASE 10 PROPIETARIO: CIERRE (Contrato)
+  {
+    name: 'Firma y entrega de llaves (Prop)',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'CIERRE',
+    items: [
+      { label: 'Contrato de arrendamiento firmado', required: true },
+      { label: 'Inventario de mobiliario y estado firmado', required: true },
+      { label: 'Recepción del primer mes y fianza confirmada', required: true },
+      { label: 'Seguro de impago contratado (si procede)', required: false },
+      { label: 'Copia del contrato entregada al propietario', required: true },
+    ],
+  },
+
+  // FASE 11 PROPIETARIO: POSVENTA (Gestión)
+  {
+    name: 'Gestión post-alquiler (Prop)',
+    operationType: 'PROPIETARIO', operationSize: 'INDIVIDUAL',
+    phase: 'POSVENTA',
+    items: [
+      { label: 'Depósito de fianza en organismo oficial realizado', required: true },
+      { label: 'Cambio de titularidad de suministros gestionado', required: true },
+      { label: 'Llamada de seguimiento a los 30 días con propietario', required: true },
+      { label: 'Incidencias iniciales resueltas', required: false },
+    ],
+  },
+
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 💰 PROCESO COMPLETO DEL INVERSOR (INVERSION_HOLDERS)
+  // Flujo: Perfilado → Criterios → KYC → Búsqueda → Análisis → Visitas → Oferta → Reserva → Compra → Gestión
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // FASE 1 INVERSOR: CAPTACIÓN (Perfilado)
+  {
+    name: 'Perfilado del inversor',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'CAPTACION',
+    items: [
+      { label: 'Entrevista inicial de perfilado realizada', required: true },
+      { label: 'Origen de los fondos identificado (PBC/FT)', required: true },
+      { label: 'Experiencia previa en inversiones inmobiliarias anotada', required: true },
+      { label: 'Capacidad de inversión (Equity vs Financiación) definida', required: true },
+    ],
+  },
+
+  // FASE 2 INVERSOR: FORMULARIO (Criterios)
+  {
+    name: 'Criterios de búsqueda y rentabilidad',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'FORMULARIO',
+    items: [
+      { label: 'Tipo de activo preferido definido (residencial, locales, edificios)', required: true },
+      { label: 'Zonas geográficas de interés seleccionadas', required: true },
+      { label: 'Ticket medio por operación definido', required: true },
+      { label: 'Rentabilidad neta (Yield) mínima esperada registrada', required: true },
+      { label: 'Plazo de la inversión (corto/largo plazo) definido', required: true },
+      { label: 'Necesidad de reforma (Flip) o rentabilidad directa confirmada', required: true },
+    ],
+  },
+
+  // FASE 3 INVERSOR: DOCUMENTACIÓN (KYC)
+  {
+    name: 'Documentación KYC y acreditación',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'DOCUMENTACION',
+    items: [
+      { label: 'DNI / CIF del inversor recibido', required: true },
+      { label: 'Certificado de titularidad bancaria recibido', required: true },
+      { label: 'Prueba de fondos (POF) validada', required: true },
+      { label: 'Formulario de Blanqueo de Capitales (KYC) firmado', required: true },
+      { label: 'Contrato de servicios de búsqueda firmado con la agencia', required: true },
+    ],
+  },
+
+  // FASE 4 INVERSOR: BÚSQUEDA ACTIVA
+  {
+    name: 'Búsqueda estratégica de activos',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'BUSQUEDA_ACTIVA',
+    items: [
+      { label: 'Búsqueda en mercado Off-Market realizada', required: true },
+      { label: 'Cribado de activos en portales y red de contactos', required: true },
+      { label: 'Envío de al menos 3 propuestas preliminares al inversor', required: true },
+    ],
+  },
+
+  // FASE 5 INVERSOR: VALORACIÓN (Análisis ROI)
+  {
+    name: 'Análisis financiero y viabilidad',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'VALORACION',
+    items: [
+      { label: 'Estudio de rentabilidad (ROI / Cash-on-Cash) realizado', required: true },
+      { label: 'Estimación de costes de reforma / adecuación realizada', required: false },
+      { label: 'Análisis de fiscalidad de la operación completado', required: true },
+      { label: 'Dossier de inversión enviado al cliente', required: true },
+    ],
+  },
+
+  // FASE 6 INVERSOR: VISITAS TÉCNICAS
+  {
+    name: 'Visitas técnicas y Due Diligence',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'VISITAS',
+    items: [
+      { label: 'Visita técnica con arquitecto/constructor (si procede)', required: false },
+      { label: 'Revisión técnica de instalaciones y estructura', required: true },
+      { label: 'Comprobación de cargas y situación urbanística', required: true },
+    ],
+  },
+
+  // FASE 7 INVERSOR: NEGOCIACIÓN (Oferta)
+  {
+    name: 'Gestión de ofertas y contraofertas',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'NEGOCIACION',
+    items: [
+      { label: 'Estrategia de negociación definida con el inversor', required: true },
+      { label: 'Oferta formal de compra enviada a la propiedad', required: true },
+      { label: 'Cierre de precio y condiciones de entrega negociado', required: true },
+    ],
+  },
+
+  // FASE 8 INVERSOR: ARRAS
+  {
+    name: 'Reserva y bloqueo de activo',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'ARRAS',
+    items: [
+      { label: 'Contrato de arras / Opción de compra firmado', required: true },
+      { label: 'Pago de la señal realizado y verificado', required: true },
+      { label: 'Preparación de documentación para notaría iniciada', required: true },
+    ],
+  },
+
+  // FASE 9 INVERSOR: CIERRE (Compra)
+  {
+    name: 'Firma de compraventa y formalización',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'CIERRE',
+    items: [
+      { label: 'Escritura pública de compraventa firmada ante notario', required: true },
+      { label: 'Liquidación de impuestos (ITP/AJD/IVA) gestionada', required: true },
+      { label: 'Inscripción en el Registro de la Propiedad solicitada', required: true },
+      { label: 'Comisión de éxito de la agencia facturada', required: true },
+    ],
+  },
+
+  // FASE 10 INVERSOR: POSVENTA (Gestión rentabilidad)
+  {
+    name: 'Gestión de rentabilidad post-compra',
+    operationType: 'INVERSION_HOLDERS', operationSize: 'INDIVIDUAL',
+    phase: 'POSVENTA',
+    items: [
+      { label: 'Inicio de obras de reforma / adecuación (si procede)', required: false },
+      { label: 'Comienzo de búsqueda de inquilinos (si es para rentabilizar)', required: false },
+      { label: 'Dossier final de la inversión entregado al cliente', required: true },
+      { label: 'Llamada de satisfacción con el inversor realizada', required: true },
+    ],
+  },
+
 ];
 
 // ─── Plantillas de email ──────────────────────────────────────────────────────
