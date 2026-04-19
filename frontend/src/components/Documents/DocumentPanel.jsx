@@ -348,7 +348,10 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                             <ExternalLink size={15} />
                           </a>
                         )}
-                        <a href={`/api/documents/${doc.id}/download`} target="_blank" rel="noreferrer"
+                        <a 
+                          href={`/api/documents/${doc.id}/download?token=${localStorage.getItem('crm_token')}`} 
+                          target="_blank" 
+                          rel="noreferrer"
                           className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all"
                           title="Descargar"
                         >
