@@ -76,6 +76,22 @@ const REQUIRED_DOCS = {
     { type: 'RENTABILIDAD', label: 'Informe Rentabilidad Proyectada', description: 'Análisis financiero' },
     { type: 'LICENCIAS_ACTIVIDAD', label: 'Licencias de Actividad', description: 'Si aplica al uso' },
     { type: 'CERT_NO_CONCURSO', label: 'Certificado No Concurso', description: 'Del vendedor/sociedad' },
+  ],
+  INQUILINO: [
+    { type: 'DNI_NIE', label: 'DNI / NIE Inquilino', description: 'Documento vigente del inquilino' },
+    { type: 'DNI_NIE_CONYUGE', label: 'DNI / NIE Pareja / Cotitular', description: 'Si alquilan conjuntamente' },
+    { type: 'NOMINAS', label: 'Últimas 3 Nóminas', description: 'Justificante de ingresos mensuales' },
+    { type: 'CONTRATO_TRABAJO', label: 'Contrato de Trabajo Vigente', description: 'Acreditar estabilidad laboral' },
+    { type: 'VIDA_LABORAL', label: 'Vida Laboral Actualizada', description: 'Del Servicio Público de Empleo' },
+    { type: 'IRPF', label: 'Declaración IRPF', description: 'Último ejercicio presentado' },
+    { type: 'EXTRACTOS_BANCO', label: 'Extractos Bancarios 3 meses', description: 'Últimos 3 meses de movimientos' },
+    { type: 'REFERENCIAS_ANTERIORES', label: 'Referencias Arrendador Anterior', description: 'Carta o contacto del antiguo casero' },
+    { type: 'CERTIFICADO_SOLVENCIA', label: 'Certificado de Solvencia', description: 'Informe ASNEF/Experian sin incidencias' },
+    { type: 'DNI_AVALISTA', label: 'DNI / NIE Avalista', description: 'Si se requiere garante' },
+    { type: 'NOMINAS_AVALISTA', label: 'Nóminas Avalista (x3)', description: 'Últimas 3 nóminas del garante' },
+    { type: 'ESCRITURA_AVALISTA', label: 'Escritura Propiedad Avalista', description: 'Si ofrece garantía real' },
+    { type: 'SEGURO_IMPAGO', label: 'Seguro de Impago Alquiler', description: 'Si lo requiere el propietario' },
+    { type: 'CUENTA_BANCARIA', label: 'Cuenta Bancaria Domiciliación', description: 'Para el pago mensual de la renta' },
   ]
 }
 

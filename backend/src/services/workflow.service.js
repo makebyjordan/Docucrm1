@@ -45,6 +45,27 @@ const TRANSITIONS = {
   POSVENTA:              { next: 'CERRADO' },
 };
 
+/**
+ * Transiciones específicas para INQUILINO.
+ * Flujo: Captación → Formulario → Documentación → Validación → Visitas → Negociación → Acuerdo → Cierre → Posventa
+ * Excluye fases de venta: Valoración, Marketing, Preventa, Búsqueda, Arras, Hipoteca, Notaría
+ */
+const INQUILINO_TRANSITIONS = {
+  CAPTACION:             { next: 'FORMULARIO' },              // Salta valoración
+  FORMULARIO:            { next: 'DOCUMENTACION' },
+  DOCUMENTACION:         { next: 'VALIDACION' },
+  VALIDACION:            {
+    next: 'VISITAS',                                           // Pasa directo a visitas
+    conditional: true,
+    onNo: 'BLOQUEADO',
+  },
+  VISITAS:               { next: 'NEGOCIACION' },              // De visitas a negociación directa
+  NEGOCIACION:           { next: 'ACUERDO_INTERESADO' },
+  ACUERDO_INTERESADO:    { next: 'CIERRE' },                   // Salta arras/hipoteca/notaría
+  CIERRE:                { next: 'POSVENTA' },
+  POSVENTA:              { next: 'CERRADO' },
+};
+
 const PHASE_LABELS = {
   CAPTACION: 'Captación',
   VALORACION: 'Valoración',
@@ -71,6 +92,17 @@ const PHASE_LABELS = {
  * Determina la siguiente fase basada en el contexto del expediente.
  */
 function getNextPhase(expedient, currentPhase, decision) {
+  // INQUILINO tiene su propio mapa de transiciones
+  if (expedient.operationType === 'INQUILINO') {
+    const transition = INQUILINO_TRANSITIONS[currentPhase];
+    if (!transition) return null;
+    if (transition.conditional) {
+      if (!decision) return null; // Necesita decisión
+      return decision === 'NO' ? transition.onNo : transition.next;
+    }
+    return transition.next;
+  }
+
   const transition = TRANSITIONS[currentPhase];
   if (!transition) return null;
 
@@ -104,7 +136,9 @@ function getNextPhase(expedient, currentPhase, decision) {
  */
 async function advance(expedient, user, notes, decision) {
   const currentPhase = expedient.currentPhase;
-  const transition = TRANSITIONS[currentPhase];
+  const isInquilino = expedient.operationType === 'INQUILINO';
+  const transitionMap = isInquilino ? INQUILINO_TRANSITIONS : TRANSITIONS;
+  const transition = transitionMap[currentPhase];
 
   if (!transition) {
     return { error: `No hay transición definida desde la fase ${currentPhase}` };

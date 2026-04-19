@@ -45,6 +45,20 @@ const PHASE_LABELS = {
   CANCELADO: 'Cancelado',
 }
 
+const INQUILINO_PHASE_LABELS = {
+  CAPTACION: 'Contacto inicial',
+  FORMULARIO: 'Datos personales',
+  DOCUMENTACION: 'Documentación inquilino',
+  VALIDACION: 'Verificación solvencia',
+  VISITAS: 'Visitas a inmuebles',
+  NEGOCIACION: 'Negociación condiciones',
+  ACUERDO_INTERESADO: 'Acuerdo / Reserva',
+  CIERRE: 'Firma contrato y entrega',
+  POSVENTA: 'Seguimiento post-alquiler',
+  CERRADO: 'Finalizado',
+  CANCELADO: 'Cancelado',
+}
+
 const CONDITIONAL_PHASES = ['VALIDACION', 'BUSQUEDA_ACTIVA', 'ARRAS', 'CIERRE']
 
 export default function ExpedientDetailPage() {
@@ -62,6 +76,19 @@ export default function ExpedientDetailPage() {
     queryFn: () => api.get(`/expedients/${id}`).then(r => r.data),
   })
 
+  // Helper: etiqueta de fase según tipo de operación
+  const phaseLabel = (phase) => {
+    if (exp?.operationType === 'INQUILINO') {
+      return INQUILINO_PHASE_LABELS[phase] || PHASE_LABELS[phase] || phase
+    }
+    return PHASE_LABELS[phase] || phase
+  }
+
+  // Fases condicionales para este tipo de operación
+  const isConditional = exp?.operationType === 'INQUILINO'
+    ? ['VALIDACION'].includes(exp?.currentPhase)  // Solo solvencia es condicional para inquilino
+    : CONDITIONAL_PHASES.includes(exp?.currentPhase)
+
   // Lógica de validación de checklists
   const currentChecklists = exp?.checklists?.filter(c => c.phase === exp?.currentPhase) || []
   const hasRequiredChecklists = currentChecklists.length > 0
@@ -78,7 +105,7 @@ export default function ExpedientDetailPage() {
   const advanceMutation = useMutation({
     mutationFn: (payload) => api.post(`/expedients/${id}/advance`, payload),
     onSuccess: (res) => {
-      toast.success(`Avanzado a: ${PHASE_LABELS[res.data.toPhase] || res.data.toPhase}`)
+      toast.success(`Avanzado a: ${phaseLabel(res.data.toPhase)}`)
       qc.invalidateQueries(['expedient', id])
       qc.invalidateQueries(['kanban'])
       setAdvanceModal(false)
@@ -122,7 +149,6 @@ export default function ExpedientDetailPage() {
     ? `${exp.client.firstName} ${exp.client.lastName || ''}`.trim()
     : exp.client?.companyName || 'Sin cliente'
 
-  const isConditional = CONDITIONAL_PHASES.includes(exp.currentPhase)
   const isFinal = ['CERRADO', 'CANCELADO', 'POSVENTA'].includes(exp.currentPhase)
 
   return (
@@ -222,7 +248,7 @@ export default function ExpedientDetailPage() {
         {tab === 'checklist' && <ChecklistPanel expedientId={id} />}
         {tab === 'documents' && <DocumentPanel expedientId={id} currentPhase={exp.currentPhase} operationType={exp.operationType} />}
         {tab === 'notifications' && <NotificationLog expedientId={id} />}
-        {tab === 'history' && <PhaseHistoryTab history={exp.phaseHistory} />}
+        {tab === 'history' && <PhaseHistoryTab history={exp.phaseHistory} operationType={exp.operationType} />}
       </div>
 
       {showParticipantModal && (
@@ -238,7 +264,7 @@ export default function ExpedientDetailPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="card p-6 w-full max-w-md">
             <p className="text-sm text-gray-600 mb-4">
-              Fase actual: <strong>{PHASE_LABELS[exp.currentPhase]}</strong>
+              Fase actual: <strong>{phaseLabel(exp.currentPhase)}</strong>
             </p>
 
             {!canAdvance && (
@@ -860,19 +886,19 @@ function ExpedientOverview({ exp, renewMutation }) {
         {!editingInmueble ? (
           <dl className="space-y-2 text-sm">
             <div className="flex">
-              <dt className="w-28 text-gray-500">Importe Arras</dt>
+              <dt className="w-28 text-gray-500">{exp.operationType === 'INQUILINO' ? 'Importe Reserva' : 'Importe Arras'}</dt>
               <dd className="font-medium">{exp.arrasAmount ? `${Number(exp.arrasAmount).toLocaleString('es-ES')} €` : '—'}</dd>
             </div>
             <div className="flex">
-              <dt className="w-28 text-gray-500">Vence Arras</dt>
+              <dt className="w-28 text-gray-500">{exp.operationType === 'INQUILINO' ? 'Vencimiento Reserva' : 'Vencimiento Arras'}</dt>
               <dd className="font-medium text-red-600">{exp.arrasDeadline ? new Date(exp.arrasDeadline).toLocaleDateString('es-ES') : '—'}</dd>
             </div>
             <div className="flex border-t pt-2 mt-2">
-              <dt className="w-28 text-gray-500">Notario</dt>
+              <dt className="w-28 text-gray-500">{exp.operationType === 'INQUILINO' ? 'Lugar de Firma' : 'Notario'}</dt>
               <dd className="font-medium">{exp.notaryName || '—'}</dd>
             </div>
             <div className="flex">
-              <dt className="w-28 text-gray-500">Fecha Cita</dt>
+              <dt className="w-28 text-gray-500">{exp.operationType === 'INQUILINO' ? 'Fecha Firma' : 'Fecha Cita'}</dt>
               <dd className="font-medium text-blue-600 font-bold">{exp.notaryDate ? new Date(exp.notaryDate).toLocaleDateString('es-ES') : '—'}</dd>
             </div>
           </dl>
@@ -880,23 +906,23 @@ function ExpedientOverview({ exp, renewMutation }) {
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label text-xs">Importe Arras</label>
+                <label className="label text-xs">{exp.operationType === 'INQUILINO' ? 'Importe Reserva' : 'Importe Arras'}</label>
                 <input type="number" className="input text-sm" value={inmuebleForm.arrasAmount}
                   onChange={e => setInmuebleForm({ ...inmuebleForm, arrasAmount: e.target.value })} />
               </div>
               <div>
-                <label className="label text-xs">Vencimiento Arras</label>
+                <label className="label text-xs">{exp.operationType === 'INQUILINO' ? 'Vencimiento Reserva' : 'Vencimiento Arras'}</label>
                 <input type="date" className="input text-sm" value={inmuebleForm.arrasDeadline}
                   onChange={e => setInmuebleForm({ ...inmuebleForm, arrasDeadline: e.target.value })} />
               </div>
             </div>
             <div>
-              <label className="label text-xs">Notario / Notaría</label>
+              <label className="label text-xs">{exp.operationType === 'INQUILINO' ? 'Lugar de Firma' : 'Notario / Notaría'}</label>
               <input type="text" className="input text-sm" value={inmuebleForm.notaryName}
                 onChange={e => setInmuebleForm({ ...inmuebleForm, notaryName: e.target.value })} />
             </div>
             <div>
-              <label className="label text-xs">Fecha Notaría</label>
+              <label className="label text-xs">{exp.operationType === 'INQUILINO' ? 'Fecha Firma' : 'Fecha Notaría'}</label>
               <input type="date" className="input text-sm" value={inmuebleForm.notaryDate}
                 onChange={e => setInmuebleForm({ ...inmuebleForm, notaryDate: e.target.value })} />
             </div>
@@ -942,27 +968,12 @@ function ExpedientOverview({ exp, renewMutation }) {
   )
 }
 
-function PhaseHistoryTab({ history = [] }) {
-  const PHASE_LABELS = {
-    CAPTACION: 'Captación',
-    VALORACION: 'Valoración',
-    FORMULARIO: 'Formulario inicial',
-    DOCUMENTACION: 'Documentación',
-    VALIDACION: 'Validación',
-    ACUERDO: 'Acuerdo / Exclusiva',
-    MARKETING_FORMULARIO: 'Brief Marketing',
-    MARKETING_EJECUCION: 'Producción Mkt',
-    VISITAS: 'Registro de Visitas',
-    PREVENTA: 'Lanzamiento Preventa',
-    BUSQUEDA_ACTIVA: 'Búsqueda activa',
-    NEGOCIACION: 'Negociación',
-    ACUERDO_INTERESADO: 'Propuesta / Señal',
-    ARRAS: 'Contrato de Arras',
-    HIPOTECA: 'Gestión Hipotecaria',
-    NOTARIA: 'Notaría y Firmas',
-    CIERRE: 'Cierre de operación',
-    POSVENTA: 'Posventa',
-    CERRADO: 'Finalizado',
+function PhaseHistoryTab({ history = [], operationType }) {
+  const getLabel = (phase) => {
+    if (operationType === 'INQUILINO') {
+      return INQUILINO_PHASE_LABELS[phase] || PHASE_LABELS[phase] || phase
+    }
+    return PHASE_LABELS[phase] || phase
   }
 
   return (
@@ -976,8 +987,8 @@ function PhaseHistoryTab({ history = [] }) {
             <div className="text-sm">
               <p className="font-medium text-gray-900">
                 {entry.fromPhase
-                  ? `${PHASE_LABELS[entry.fromPhase] || entry.fromPhase} → ${PHASE_LABELS[entry.toPhase] || entry.toPhase}`
-                  : `Apertura en ${PHASE_LABELS[entry.toPhase] || entry.toPhase}`}
+                  ? `${getLabel(entry.fromPhase)} → ${getLabel(entry.toPhase)}`
+                  : `Apertura en ${getLabel(entry.toPhase)}`}
               </p>
               {entry.notes && <p className="text-gray-500 mt-0.5">{entry.notes}</p>}
               <p className="text-gray-400 text-xs mt-1">

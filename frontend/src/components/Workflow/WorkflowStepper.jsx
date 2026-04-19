@@ -21,16 +21,32 @@ const STEPS = [
   { id: 'POSVENTA', label: 'P-Venta' },
 ]
 
+// Fases específicas del proceso de INQUILINO
+const INQUILINO_STEPS = [
+  { id: 'CAPTACION', label: 'Contacto' },
+  { id: 'FORMULARIO', label: 'Datos' },
+  { id: 'DOCUMENTACION', label: 'Docs.' },
+  { id: 'VALIDACION', label: 'Solvencia' },
+  { id: 'VISITAS', label: 'Visitas' },
+  { id: 'NEGOCIACION', label: 'Negociac.' },
+  { id: 'ACUERDO_INTERESADO', label: 'Acuerdo' },
+  { id: 'CIERRE', label: 'Contrato' },
+  { id: 'POSVENTA', label: 'Seguim.' },
+]
+
 export default function WorkflowStepper({ currentPhase, status, operationType }) {
-  // Filtrar pasos según el tipo de operación
-  const visibleSteps = STEPS.filter(step => {
-    // Si es COMPRA, saltamos VALORACIÓN
-    if (operationType === 'COMPRA' && step.id === 'VALORACION') return false;
-    
-    // Si no es INVERSION/GRANDE, podríamos saltar fases de marketing si fuera necesario, 
-    // pero por ahora las dejamos todas visibles para que el usuario conozca el flujo completo.
-    return true;
-  });
+  // Seleccionar pasos según el tipo de operación
+  let visibleSteps;
+
+  if (operationType === 'INQUILINO') {
+    visibleSteps = INQUILINO_STEPS;
+  } else {
+    visibleSteps = STEPS.filter(step => {
+      // Si es COMPRA, saltamos VALORACIÓN
+      if (operationType === 'COMPRA' && step.id === 'VALORACION') return false;
+      return true;
+    });
+  }
 
   const currentIdx = visibleSteps.findIndex(s => s.id === currentPhase)
 

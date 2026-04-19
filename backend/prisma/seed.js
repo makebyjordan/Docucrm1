@@ -585,6 +585,177 @@ const CHECKLIST_TEMPLATES = [
     ],
   },
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🏠 PROCESO COMPLETO DEL INQUILINO
+  // Flujo: Contacto → Datos → Docs → Solvencia → Visitas → Negociación → Acuerdo → Contrato → Seguimiento
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // FASE 1 INQUILINO: CAPTACIÓN (Contacto inicial)
+  {
+    name: 'Contacto inicial - Inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'CAPTACION',
+    items: [
+      { label: 'Primer contacto realizado con el inquilino', required: true },
+      { label: 'Origen del lead registrado (web, referido, portal, llamada)', required: true },
+      { label: 'Tipo de vivienda buscada registrada (piso, casa, estudio)', required: true },
+      { label: 'Zona/barrios de interés definidos', required: true },
+      { label: 'Presupuesto mensual máximo del inquilino registrado', required: true },
+      { label: 'Fecha de entrada deseada registrada', required: true },
+      { label: 'Número de convivientes registrado', required: true },
+      { label: 'Mascotas (sí/no) registrado', required: false },
+      { label: 'Necesidades especiales registradas (accesibilidad, garaje)', required: false },
+    ],
+  },
+
+  // FASE 2 INQUILINO: FORMULARIO (Datos personales)
+  {
+    name: 'Datos personales - Inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'FORMULARIO',
+    items: [
+      { label: 'Nombre completo del inquilino registrado', required: true },
+      { label: 'DNI/NIE registrado en sistema', required: true },
+      { label: 'Nacionalidad registrada', required: true },
+      { label: 'Teléfono de contacto verificado', required: true },
+      { label: 'Email confirmado y verificado', required: true },
+      { label: 'Dirección actual registrada', required: true },
+      { label: 'Situación laboral registrada (cuenta ajena/autónomo/funcionario)', required: true },
+      { label: 'Ingresos mensuales netos aproximados registrados', required: true },
+      { label: 'Datos del cónyuge/pareja registrados (si alquiler conjunto)', required: false },
+      { label: 'Política de privacidad y RGPD firmada', required: true },
+      { label: 'Motivo del alquiler registrado (cambio ciudad, emancipación, separación)', required: false },
+    ],
+  },
+
+  // FASE 3 INQUILINO: DOCUMENTACIÓN (Recopilación docs)
+  {
+    name: 'Documentación del inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'DOCUMENTACION',
+    items: [
+      { label: 'DNI/NIE del inquilino recibido (copia vigente)', required: true },
+      { label: 'DNI/NIE pareja/cotitular recibido (si aplica)', required: false },
+      { label: 'Últimas 3 nóminas recibidas', required: true },
+      { label: 'Contrato de trabajo vigente recibido', required: true },
+      { label: 'Vida laboral actualizada recibida', required: true },
+      { label: 'Declaración IRPF último ejercicio recibida', required: true },
+      { label: 'Extractos bancarios últimos 3 meses recibidos', required: true },
+      { label: 'Referencias de arrendadores anteriores recibidas', required: false },
+      { label: 'DNI/NIE del avalista recibido (si se requiere)', required: false },
+      { label: 'Nóminas del avalista recibidas (si se requiere)', required: false },
+      { label: 'Escritura de propiedad del avalista (si garantía real)', required: false },
+      { label: 'Cuenta bancaria para domiciliación del alquiler facilitada', required: true },
+    ],
+  },
+
+  // FASE 4 INQUILINO: VALIDACIÓN (Solvencia)
+  {
+    name: 'Verificación de solvencia - Inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'VALIDACION',
+    items: [
+      { label: 'DNI/NIE vigente y datos correctos', required: true },
+      { label: 'Ingresos mensuales verificados (mínimo x3 renta mensual)', required: true },
+      { label: 'Estabilidad laboral verificada (antigüedad > 6 meses)', required: true },
+      { label: 'Consulta ASNEF/ficheros de morosos realizada (sin incidencias)', required: true },
+      { label: 'IRPF coherente con nóminas declaradas', required: true },
+      { label: 'Extractos bancarios sin incidencias (descubiertos, embargos)', required: true },
+      { label: 'Solvencia del avalista verificada (si aplica)', required: false },
+      { label: 'Capacidad de pago aprobada por el propietario', required: true },
+      { label: 'Perfil del inquilino validado internamente (agencia)', required: true },
+    ],
+  },
+
+  // FASE 5 INQUILINO: VISITAS
+  {
+    name: 'Visitas a inmuebles - Inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'VISITAS',
+    items: [
+      { label: 'Listado de inmuebles disponibles preparado según perfil', required: true },
+      { label: 'Al menos 3 visitas realizadas y documentadas', required: true },
+      { label: 'Feedback de cada visita registrado en sistema', required: true },
+      { label: 'Inmueble favorito del inquilino identificado', required: true },
+      { label: 'Informe de estado del inmueble revisado con inquilino', required: true },
+      { label: 'Inventario de muebles/equipamiento revisado (si amueblado)', required: false },
+    ],
+  },
+
+  // FASE 6 INQUILINO: NEGOCIACIÓN
+  {
+    name: 'Negociación condiciones - Inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'NEGOCIACION',
+    items: [
+      { label: 'Renta mensual definitiva acordada', required: true },
+      { label: 'Duración del contrato acordada (1 año mín / 5 años prórroga)', required: true },
+      { label: 'Importe de fianza definido (1-2 meses)', required: true },
+      { label: 'Garantías adicionales acordadas (aval bancario, seguro impago)', required: false },
+      { label: 'Gastos incluidos en renta definidos (comunidad, basuras)', required: true },
+      { label: 'Suministros a cargo del inquilino definidos', required: true },
+      { label: 'Cláusulas especiales pactadas (mascotas, obras, subarriendo)', required: false },
+      { label: 'Fecha de inicio del contrato acordada', required: true },
+      { label: 'Propietario acepta al candidato formalmente', required: true },
+    ],
+  },
+
+  // FASE 7 INQUILINO: ACUERDO
+  {
+    name: 'Acuerdo / Reserva - Inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'ACUERDO_INTERESADO',
+    items: [
+      { label: 'Documento de reserva firmado por inquilino', required: true },
+      { label: 'Señal/reserva abonada por el inquilino (si procede)', required: false },
+      { label: 'Borrador del contrato de arrendamiento redactado', required: true },
+      { label: 'Borrador revisado por inquilino y propietario', required: true },
+      { label: 'Seguro de impago de alquiler contratado (si lo requiere propietario)', required: false },
+      { label: 'Seguro de hogar contratado o compromiso de contratación', required: false },
+      { label: 'Fecha definitiva de firma del contrato confirmada', required: true },
+    ],
+  },
+
+  // FASE 8 INQUILINO: CIERRE (Firma contrato y entrega)
+  {
+    name: 'Firma contrato y entrega - Inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'CIERRE',
+    items: [
+      { label: 'Contrato de arrendamiento firmado por ambas partes', required: true },
+      { label: 'Inventario del inmueble firmado por ambas partes', required: true },
+      { label: 'Fianza abonada por el inquilino', required: true },
+      { label: 'Fianza depositada en organismo oficial (INCASOL, IVIMA, etc.)', required: true },
+      { label: 'Recibo de depósito de fianza entregado al inquilino', required: true },
+      { label: 'Primer mes de renta abonado', required: true },
+      { label: 'Garantías adicionales formalizadas (aval, seguro)', required: false },
+      { label: 'Acta de entrega de llaves firmada', required: true },
+      { label: 'Llaves entregadas al inquilino (portal, buzón, vivienda)', required: true },
+      { label: 'Códigos de alarma / acceso portal entregados', required: false },
+      { label: 'Alta de suministros a nombre del inquilino gestionada', required: true },
+      { label: 'Domiciliación bancaria del alquiler tramitada', required: true },
+      { label: 'Copia del contrato entregada al inquilino', required: true },
+      { label: 'Copia del contrato archivada en Drive', required: true },
+      { label: 'Comisión de la agencia facturada y cobrada', required: true },
+    ],
+  },
+
+  // FASE 9 INQUILINO: POSVENTA (Seguimiento)
+  {
+    name: 'Seguimiento post-alquiler - Inquilino',
+    operationType: 'INQUILINO', operationSize: 'INDIVIDUAL',
+    phase: 'POSVENTA',
+    items: [
+      { label: 'Llamada de seguimiento a los 15 días realizada', required: true },
+      { label: 'Verificar que suministros están correctamente dados de alta', required: true },
+      { label: 'Verificar primer pago de renta recibido correctamente', required: true },
+      { label: 'Incidencias del primer mes resueltas (si las hubiera)', required: false },
+      { label: 'Contacto añadido a base de datos para futuras operaciones', required: true },
+      { label: 'Encuesta de satisfacción enviada al inquilino', required: false },
+      { label: 'Seguimiento a los 3 meses programado', required: false },
+    ],
+  },
+
 ];
 
 // ─── Plantillas de email ──────────────────────────────────────────────────────
