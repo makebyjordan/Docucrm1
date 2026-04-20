@@ -45,29 +45,8 @@ enum OperationSize {
   GRANDE
 }
 
-enum Phase {
-  CAPTACION
-  VALORACION
-  FORMULARIO
-  DOCUMENTACION
-  VALIDACION
-  ACUERDO
-  MARKETING_FORMULARIO
-  MARKETING_EJECUCION
-  VISITAS
-  PREVENTA
-  BUSQUEDA_ACTIVA
-  NEGOCIACION
-  ACUERDO_INTERESADO
-  ARRAS
-  HIPOTECA
-  NOTARIA
-  CIERRE
-  POSVENTA
-  CERRADO
-  CANCELADO
-  BLOQUEADO
-}
+// Phase is now a String to allow custom values from settings
+// Standard values: CAPTACION, VALORACION, FORMULARIO, DOCUMENTACION, VALIDACION, ACUERDO, MARKETING_FORMULARIO, MARKETING_EJECUCION, VISITAS, PREVENTA, BUSQUEDA_ACTIVA, NEGOCIACION, ACUERDO_INTERESADO, ARRAS, HIPOTECA, NOTARIA, CIERRE, POSVENTA, CERRADO, CANCELADO, BLOQUEADO
 
 enum ExpedientStatus {
   ACTIVO
@@ -162,7 +141,7 @@ model Expedient {
   clientId      String
   operationType OperationType
   operationSize OperationSize   @default(INDIVIDUAL)
-  currentPhase  Phase           @default(CAPTACION)
+  currentPhase  String           @default("CAPTACION")
   status        ExpedientStatus @default(ACTIVO)
 
   propertyAddress String?
@@ -279,8 +258,8 @@ model ExpedientAssignment {
 model PhaseHistory {
   id          String    @id @default(cuid())
   expedientId String
-  fromPhase   Phase?
-  toPhase     Phase
+  fromPhase   String?
+  toPhase     String
   changedById String?
   notes       String?
   createdAt   DateTime  @default(now())
@@ -313,7 +292,7 @@ model ChecklistTemplate {
   operationType OperationType
   operationSize OperationSize @default(INDIVIDUAL)
   clientType    ClientType?
-  phase         Phase
+  phase         String
   description   String?
   active        Boolean       @default(true)
   order         Int           @default(0)
@@ -342,13 +321,13 @@ model ChecklistInstance {
   id          String    @id @default(cuid())
   expedientId String
   templateId  String
-  phase       Phase
+  phase       String
   completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   expedient Expedient              @relation(fields: [expedientId], references: [id], onDelete: Cascade)
-  template  ChecklistTemplate      @relation(fields: [templateId], references: [id])
+  template  ChecklistTemplate      @relation(fields: [templateId], references: [id], onDelete: Cascade)
   items     ChecklistInstanceItem[]
 
   @@map("checklist_instances")
@@ -379,7 +358,7 @@ model Document {
   uploadedById   String?
   name           String
   docType        String
-  phase          Phase
+  phase          String
   status         DocumentStatus @default(PENDIENTE)
   driveFileId    String?
   driveUrl       String?

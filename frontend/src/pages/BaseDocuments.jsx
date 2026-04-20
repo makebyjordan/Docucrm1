@@ -101,9 +101,9 @@ export default function BaseDocuments() {
               </h3>
               <div className="flex items-center gap-2 text-[10px] mt-0.5 whitespace-nowrap overflow-hidden">
                 <span className="font-extrabold text-blue-600 uppercase tracking-wider">{doc.category}</span>
-                <span className="text-gray-300">•</span>
+                <span className="text-[var(--border-color)]">•</span>
                 <span className="text-gray-400">{doc.fileSize ? `${(doc.fileSize / 1024).toFixed(0)} KB` : ''}</span>
-                <span className="text-gray-300">•</span>
+                <span className="text-[var(--border-color)]">•</span>
                 <span className="font-bold text-gray-500 uppercase">{doc.name.split('.').pop() || 'DOC'}</span>
               </div>
             </div>
@@ -150,9 +150,9 @@ export default function BaseDocuments() {
 
         {filteredDocs.length === 0 && !isLoading && (
           <div className="col-span-full py-20 text-center bg-[var(--bg-color)]/50 rounded-2xl border-2 border-dashed border-[var(--border-color)]">
-            <FileIcon className="mx-auto text-gray-300 mb-3" size={48} />
+            <FileIcon className="mx-auto text-[var(--border-color)] mb-3" size={48} />
             <p className="text-gray-400 font-medium">No se encontraron documentos</p>
-            <p className="text-gray-300 text-sm">Prueba con otra búsqueda o añade uno nuevo</p>
+            <p className="text-[var(--border-color)] text-sm">Prueba con otra búsqueda o añade uno nuevo</p>
           </div>
         )}
       </div>

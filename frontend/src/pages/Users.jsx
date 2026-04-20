@@ -6,10 +6,10 @@ import { Plus, Edit2, X, UserCheck, UserX } from 'lucide-react'
 import api from '../api/client'
 
 const ROLE_COLORS = {
-  COMERCIAL: 'bg-blue-100 text-blue-700',
-  FIRMAS: 'bg-green-100 text-green-700',
-  MARKETING: 'bg-purple-100 text-purple-700',
-  DIRECCION: 'bg-orange-100 text-orange-700',
+  COMERCIAL: 'bg-blue-500/20 text-blue-400',
+  FIRMAS: 'bg-green-500/20 text-green-400',
+  MARKETING: 'bg-purple-500/20 text-purple-400',
+  DIRECCION: 'bg-orange-500/20 text-orange-400',
   ADMINISTRACION: 'bg-[var(--sidebar-bg)] text-[var(--text-muted)]',
 }
 
@@ -55,7 +55,7 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3 text-[var(--text-muted)]">{u.phone || '—'}</td>
                   <td className="px-4 py-3">
-                    <span className={`badge ${u.active ? 'bg-green-100 text-green-700' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
+                    <span className={`badge ${u.active ? 'bg-green-500/20 text-green-400' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
                       {u.active ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>

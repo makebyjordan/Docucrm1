@@ -86,11 +86,21 @@ async function updateTemplate(req, res) {
   res.json(updated);
 }
 
-async function deleteTemplate(req, res) {
-  await prisma.checklistTemplate.delete({
-    where: { id: req.params.id },
-  });
-  res.json({ success: true });
+async function deleteTemplate(req, res, next) {
+  try {
+    console.log(`Intentando borrar checklistTemplate ID: ${req.params.id}`);
+    await prisma.checklistTemplate.delete({
+      where: { id: req.params.id },
+    });
+    console.log(`ChecklistTemplate ${req.params.id} borrado exitosamente.`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error al borrar checklistTemplate:', err);
+    if (err.code === 'P2003') {
+      return res.status(400).json({ error: 'No se puede eliminar esta fase porque ya está siendo utilizada en expedientes activos. Tendrías que borrar esos expedientes primero.' });
+    }
+    next(err);
+  }
 }
 
 async function listByExpedient(req, res) {

@@ -5,18 +5,18 @@ import KanbanCard from './KanbanCard'
 import { AlertCircle } from 'lucide-react'
 
 const COLUMNS = [
-  { id: 'CAPTACION', label: 'Captación', color: 'bg-[var(--sidebar-bg)] border-t-2 border-gray-500' },
-  { id: 'FORMULARIO', label: 'Formulario', color: 'bg-[var(--sidebar-bg)] border-t-2 border-blue-500' },
-  { id: 'DOCUMENTACION', label: 'Documentación', color: 'bg-[var(--sidebar-bg)] border-t-2 border-indigo-500' },
-  { id: 'VALIDACION', label: 'Validación', color: 'bg-[var(--sidebar-bg)] border-t-2 border-purple-500' },
-  { id: 'ACUERDO', label: 'Acuerdo', color: 'bg-[var(--sidebar-bg)] border-t-2 border-yellow-500' },
-  { id: 'MARKETING_FORMULARIO', label: 'Brief Mkt', color: 'bg-[var(--sidebar-bg)] border-t-2 border-orange-500' },
-  { id: 'MARKETING_EJECUCION', label: 'Producción', color: 'bg-[var(--sidebar-bg)] border-t-2 border-amber-500' },
-  { id: 'PREVENTA', label: 'Preventa', color: 'bg-[var(--sidebar-bg)] border-t-2 border-green-500' },
-  { id: 'BUSQUEDA_ACTIVA', label: 'Búsqueda', color: 'bg-[var(--sidebar-bg)] border-t-2 border-teal-500' },
-  { id: 'ACUERDO_INTERESADO', label: 'Interesado', color: 'bg-[var(--sidebar-bg)] border-t-2 border-cyan-500' },
-  { id: 'CIERRE', label: 'Cierre', color: 'bg-[var(--sidebar-bg)] border-t-2 border-emerald-500' },
-  { id: 'POSVENTA', label: 'Posventa', color: 'bg-[var(--sidebar-bg)] border-t-2 border-lime-500' },
+  { id: 'CAPTACION', label: 'Captación', color: 'border-slate-400' },
+  { id: 'FORMULARIO', label: 'Formulario', color: 'border-blue-500' },
+  { id: 'DOCUMENTACION', label: 'Documentación', color: 'border-indigo-500' },
+  { id: 'VALIDACION', label: 'Validación', color: 'border-purple-500' },
+  { id: 'ACUERDO', label: 'Acuerdo', color: 'border-yellow-500' },
+  { id: 'MARKETING_FORMULARIO', label: 'Brief Mkt', color: 'border-orange-500' },
+  { id: 'MARKETING_EJECUCION', label: 'Producción', color: 'border-rose-500' },
+  { id: 'PREVENTA', label: 'Preventa', color: 'border-emerald-500' },
+  { id: 'BUSQUEDA_ACTIVA', label: 'Búsqueda', color: 'border-teal-500' },
+  { id: 'ACUERDO_INTERESADO', label: 'Interesado', color: 'border-cyan-500' },
+  { id: 'CIERRE', label: 'Cierre', color: 'border-green-500' },
+  { id: 'POSVENTA', label: 'Posventa', color: 'border-violet-500' },
 ]
 
 export default function KanbanBoard({ filters }) {
@@ -56,16 +56,16 @@ export default function KanbanBoard({ filters }) {
       {COLUMNS.map(col => {
         const cards = filter(columns?.[col.id] || [])
         return (
-          <div key={col.id} className="flex-shrink-0 w-64">
+          <div key={col.id} className="flex-shrink-0 w-72 flex flex-col h-full bg-[var(--sidebar-bg)]/50 rounded-xl border border-[var(--border-color)] overflow-hidden">
             {/* Column header */}
-            <div className={`rounded-t-lg px-3 py-2 ${col.color} flex items-center justify-between`}>
-              <span className="font-semibold text-sm text-[var(--text-main)]">{col.label}</span>
-              <span className="text-xs bg-black/30 rounded-full px-2 py-0.5 font-mono font-bold text-[var(--text-main)]">
+            <div className={`px-4 py-3 bg-[var(--sidebar-bg)] border-t-4 ${col.color} flex items-center justify-between shadow-sm`}>
+              <span className="font-bold text-xs uppercase tracking-wider text-[var(--text-main)]">{col.label}</span>
+              <span className="text-[10px] bg-[var(--bg-color)] border border-[var(--border-color)] rounded-full px-2 py-0.5 font-bold text-[var(--text-muted)]">
                 {cards.length}
               </span>
             </div>
             {/* Cards */}
-            <div className="bg-[var(--sidebar-bg)] rounded-b-lg min-h-24 p-2 space-y-2">
+            <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-hide">
               {cards.map(exp => (
                 <Link key={exp.id} to={`/expedients/${exp.id}`}>
                   <KanbanCard expedient={exp} />

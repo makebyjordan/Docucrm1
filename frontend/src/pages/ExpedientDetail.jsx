@@ -203,13 +203,13 @@ export default function ExpedientDetailPage() {
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-[var(--text-main)] font-mono">{exp.code}</h2>
             <span className={`badge text-xs ${
-              exp.status === 'BLOQUEADO' ? 'bg-red-100 text-red-700' :
-              exp.status === 'COMPLETADO' ? 'bg-blue-100 text-blue-700' :
-              'bg-green-100 text-green-700'
+              exp.status === 'BLOQUEADO' ? 'bg-red-500/20 text-red-400' :
+              exp.status === 'COMPLETADO' ? 'bg-blue-500/20 text-blue-400' :
+              'bg-green-500/20 text-green-400'
             }`}>{exp.status}</span>
             <span className="badge bg-[var(--sidebar-bg)] text-[var(--text-muted)] text-xs">{exp.operationType}</span>
             {exp.operationSize !== 'INDIVIDUAL' && (
-              <span className="badge bg-purple-100 text-purple-700 text-xs">{exp.operationSize}</span>
+              <span className="badge bg-purple-500/20 text-purple-400 text-xs">{exp.operationSize}</span>
             )}
           </div>
           <p className="text-gray-500 text-sm mt-0.5">
@@ -235,7 +235,7 @@ export default function ExpedientDetailPage() {
                 <ArrowRight size={15} />
                 Avanzar fase
                 {!canAdvance && (
-                  <span className="absolute -top-2 -right-2 bg-[var(--sidebar-bg)]0 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm font-bold">
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm font-bold">
                     {pendingRequired}
                   </span>
                 )}
@@ -706,7 +706,7 @@ function ExpedientOverview({ exp, renewMutation }) {
             return (
               <div key={label} className="flex items-center gap-3">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                  user ? 'bg-[var(--sidebar-bg)]0' : 'bg-gray-300'
+                  user ? 'bg-[var(--primary-color)]' : 'bg-gray-300'
                 }`}>
                   {user ? user.name.charAt(0) : '?'}
                 </div>
@@ -738,7 +738,7 @@ function ExpedientOverview({ exp, renewMutation }) {
           {(exp.clientRoles || []).map(role => (
             <div key={role.id} className="flex items-center justify-between p-2 rounded-lg bg-[var(--bg-color)] group">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-[10px] font-bold">
+                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-[10px] font-bold">
                   {role.role.charAt(0)}
                 </div>
                 <div>
@@ -799,10 +799,10 @@ function ExpedientOverview({ exp, renewMutation }) {
               <dd className="font-bold text-[var(--text-main)]">{exp.commissionFixed ? `${Number(exp.commissionFixed).toLocaleString('es-ES')} €` : '—'}</dd>
             </div>
             <div className="flex pt-1 gap-4">
-              <span className={`badge text-[10px] ${exp.commissionInvoiced ? 'bg-green-100 text-green-700' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
+              <span className={`badge text-[10px] ${exp.commissionInvoiced ? 'bg-green-500/20 text-green-400' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
                 {exp.commissionInvoiced ? 'Facturado' : 'No facturado'}
               </span>
-              <span className={`badge text-[10px] ${exp.commissionPaid ? 'bg-blue-100 text-blue-700' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
+              <span className={`badge text-[10px] ${exp.commissionPaid ? 'bg-blue-500/20 text-blue-400' : 'bg-[var(--sidebar-bg)] text-gray-500'}`}>
                 {exp.commissionPaid ? 'Cobrado' : 'No cobrado'}
               </span>
             </div>
@@ -1104,7 +1104,7 @@ function VisitsPanel({ expedientId }) {
         
         {visitsList.map(v => (
           <div key={v.id} className="flex gap-4 p-4 rounded-xl border border-[var(--border-color)] hover:border-blue-100 hover:bg-[var(--sidebar-bg)]/30 transition-all group">
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0 font-bold">
+            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0 font-bold">
               {v.visitorName.charAt(0)}
             </div>
             <div className="flex-1">
@@ -1112,8 +1112,8 @@ function VisitsPanel({ expedientId }) {
                 <h4 className="font-bold text-[var(--text-main)]">{v.visitorName}</h4>
                 <div className="flex items-center gap-2">
                   <span className={`badge text-[10px] ${
-                    v.interestLevel === 'HIGH' ? 'bg-green-100 text-green-700' :
-                    v.interestLevel === 'MID' ? 'bg-blue-100 text-blue-700' :
+                    v.interestLevel === 'HIGH' ? 'bg-green-500/20 text-green-400' :
+                    v.interestLevel === 'MID' ? 'bg-blue-500/20 text-blue-400' :
                     'bg-[var(--sidebar-bg)] text-[var(--text-muted)]'
                   }`}>
                     Interés {v.interestLevel}

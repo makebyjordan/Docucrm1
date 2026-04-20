@@ -13,8 +13,8 @@ import api from '../api/client'
 import toast from 'react-hot-toast'
 
 const EVENT_TYPES = [
-  { value: 'VISITA',    label: 'Visita',        color: 'bg-[var(--sidebar-bg)]0' },
-  { value: 'REUNION',   label: 'Reunión',        color: 'bg-[var(--sidebar-bg)]0' },
+  { value: 'VISITA',    label: 'Visita',        color: 'bg-blue-600' },
+  { value: 'REUNION',   label: 'Reunión',        color: 'bg-indigo-600' },
   { value: 'LLAMADA',   label: 'Llamada',        color: 'bg-yellow-500' },
   { value: 'FIRMA',     label: 'Firma',          color: 'bg-purple-500' },
   { value: 'OTRO',      label: 'Otro',           color: 'bg-gray-400' },
@@ -113,7 +113,7 @@ function EventModal({ event, defaultDate, onClose, onSaved }) {
                   className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
                     form.type === t.value
                       ? `${t.color} text-white border-transparent`
-                      : 'bg-[var(--card-bg)] text-[var(--text-muted)] border-gray-300 hover:border-gray-400'
+                      : 'bg-[var(--card-bg)] text-[var(--text-muted)] border-[var(--border-color)] hover:border-[var(--tertiary-color)]'
                   }`}>
                   {t.label}
                 </button>
@@ -338,12 +338,12 @@ export default function CalendarPage() {
           {/* Cabecera días semana */}
           <div className="grid grid-cols-7 mb-1">
             {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (
-              <div key={d} className="text-xs font-semibold text-gray-400 text-center py-2">{d}</div>
+              <div key={d} className="text-xs font-semibold text-[var(--text-muted)] text-center py-2">{d}</div>
             ))}
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden border border-[var(--border-color)]">
+          <div className="grid grid-cols-7 gap-px bg-[var(--border-color)] rounded-lg overflow-hidden border border-[var(--border-color)]">
             {days.map(day => {
               const dayEvents = eventsOnDay(day)
               const isCurrentMonth = isSameMonth(day, current)
@@ -371,7 +371,7 @@ export default function CalendarPage() {
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className="text-[10px] text-gray-400 pl-1">+{dayEvents.length - 3} más</div>
+                      <div className="text-[10px] text-[var(--text-muted)] pl-1">+{dayEvents.length - 3} más</div>
                     )}
                   </div>
                 </div>
@@ -385,7 +385,7 @@ export default function CalendarPage() {
           {selected ? (
             <>
               <div className="px-4 py-3 border-b flex items-center justify-between">
-                <p className="text-sm font-semibold text-gray-800 capitalize">
+                <p className="text-sm font-semibold text-[var(--text-main)] capitalize">
                   {format(selected, "EEEE d 'de' MMMM", { locale: es })}
                 </p>
                 <button onClick={() => setModal({ mode: 'create', date: format(selected, 'yyyy-MM-dd') })}
@@ -395,7 +395,7 @@ export default function CalendarPage() {
               </div>
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {selectedDayEvents.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center mt-8">Sin eventos este día</p>
+                  <p className="text-sm text-[var(--text-muted)] text-center mt-8">Sin eventos este día</p>
                 ) : selectedDayEvents.map(ev => (
                   <EventCard key={ev.id} ev={ev}
                     onEdit={() => setModal({ mode: 'edit', event: ev })}
@@ -406,12 +406,12 @@ export default function CalendarPage() {
           ) : (
             <>
               <div className="px-4 py-3 border-b">
-                <p className="text-sm font-semibold text-gray-800">Próximos eventos</p>
+                <p className="text-sm font-semibold text-[var(--text-main)]">Próximos eventos</p>
               </div>
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
-                {loading && <p className="text-sm text-gray-400 text-center mt-8">Cargando...</p>}
+                {loading && <p className="text-sm text-[var(--text-muted)] text-center mt-8">Cargando...</p>}
                 {!loading && upcomingEvents.length === 0 && (
-                  <p className="text-sm text-gray-400 text-center mt-8">No hay eventos próximos</p>
+                  <p className="text-sm text-[var(--text-muted)] text-center mt-8">No hay eventos próximos</p>
                 )}
                 {upcomingEvents.map(ev => (
                   <EventCard key={ev.id} ev={ev}
@@ -443,7 +443,7 @@ function EventCard({ ev, onEdit, onDelete }) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <span className={`w-2 h-2 rounded-full shrink-0 ${typeColor(ev.type)}`} />
-          <p className="text-sm font-medium text-gray-800 truncate">{ev.title}</p>
+          <p className="text-sm font-medium text-[var(--text-main)] truncate">{ev.title}</p>
         </div>
         <div className="flex gap-1 shrink-0">
           <button onClick={onEdit} className="text-gray-400 hover:text-blue-600 transition-colors">
@@ -455,7 +455,7 @@ function EventCard({ ev, onEdit, onDelete }) {
         </div>
       </div>
       <div className="mt-1.5 space-y-1">
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
           <Clock size={11} />
           {ev.allDay
             ? format(parseISO(ev.startAt), "d MMM yyyy", { locale: es })
@@ -466,19 +466,19 @@ function EventCard({ ev, onEdit, onDelete }) {
           {typeLabel(ev.type)}
         </span>
         {ev.client && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
             <User size={11} />
             {ev.client.firstName || ev.client.companyName} {ev.client.lastName ?? ''}
           </div>
         )}
         {ev.expedient && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
             <FileText size={11} />
             {ev.expedient.code}
           </div>
         )}
         {ev.notes && (
-          <p className="text-xs text-gray-400 truncate">{ev.notes}</p>
+          <p className="text-xs text-[var(--text-muted)] truncate">{ev.notes}</p>
         )}
       </div>
     </div>
@@ -487,9 +487,9 @@ function EventCard({ ev, onEdit, onDelete }) {
 
 // ─── Vista Lista ──────────────────────────────────────────────────────────────
 function ListView({ events, loading, onEdit, onDelete }) {
-  if (loading) return <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">Cargando...</div>
+  if (loading) return <div className="flex-1 flex items-center justify-center text-[var(--text-muted)] text-sm">Cargando...</div>
   if (events.length === 0) return (
-    <div className="flex-1 flex flex-col items-center justify-center text-gray-400 gap-2">
+    <div className="flex-1 flex flex-col items-center justify-center text-[var(--text-muted)] gap-2">
       <CalIcon size={40} className="opacity-30" />
       <p className="text-sm">No hay eventos guardados</p>
     </div>
@@ -517,8 +517,8 @@ function ListView({ events, loading, onEdit, onDelete }) {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
-          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-wider">{title}</h2>
-          <span className="text-xs text-gray-400">({entries.reduce((s, [, e]) => s + e.length, 0)} eventos)</span>
+          <h2 className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">{title}</h2>
+          <span className="text-xs text-[var(--text-muted)]">({entries.reduce((s, [, e]) => s + e.length, 0)} eventos)</span>
         </div>
         <div className="space-y-5">
           {entries.map(([key, evs]) => (
@@ -533,31 +533,31 @@ function ListView({ events, loading, onEdit, onDelete }) {
                     <div className={`w-1 self-stretch rounded-full shrink-0 ${typeColor(ev.type)}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-gray-800">{ev.title}</span>
+                        <span className="text-sm font-semibold text-[var(--text-main)]">{ev.title}</span>
                         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full text-white ${typeColor(ev.type)}`}>
                           {typeLabel(ev.type)}
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1">
-                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                        <span className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
                           <Clock size={11} />
                           {ev.allDay ? 'Todo el día' : format(parseISO(ev.startAt), 'HH:mm')}
                           {ev.endAt && !ev.allDay && ` – ${format(parseISO(ev.endAt), 'HH:mm')}`}
                         </span>
                         {ev.client && (
-                          <span className="flex items-center gap-1 text-xs text-gray-500">
+                          <span className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
                             <User size={11} />
                             {ev.client.firstName || ev.client.companyName} {ev.client.lastName ?? ''}
                           </span>
                         )}
                         {ev.expedient && (
-                          <span className="flex items-center gap-1 text-xs text-gray-500">
+                          <span className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
                             <FileText size={11} />
                             {ev.expedient.code}
                           </span>
                         )}
                       </div>
-                      {ev.notes && <p className="text-xs text-gray-400 mt-1">{ev.notes}</p>}
+                      {ev.notes && <p className="text-xs text-[var(--text-muted)] mt-1">{ev.notes}</p>}
                     </div>
                     <div className="flex gap-1 shrink-0 mt-0.5">
                       <button onClick={() => onEdit(ev)} className="text-gray-400 hover:text-blue-600 transition-colors p-1">
@@ -579,8 +579,8 @@ function ListView({ events, loading, onEdit, onDelete }) {
 
   return (
     <div className="flex-1 overflow-y-auto px-6 py-5 bg-[var(--bg-color)]">
-      <Section title="Hoy" color="bg-[var(--sidebar-bg)]0" entries={today} />
-      <Section title="Próximos" color="bg-[var(--sidebar-bg)]0" entries={upcoming} />
+      <Section title="Hoy" color="bg-blue-600" entries={today} />
+      <Section title="Próximos" color="bg-indigo-600" entries={upcoming} />
       <Section title="Pasados" color="bg-gray-400" entries={[...past].reverse()} />
     </div>
   )

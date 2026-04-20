@@ -7,7 +7,7 @@ const { authorize } = require('../middleware/auth.middleware');
 router.get('/templates', ctrl.listTemplates);
 router.post('/templates', authorize('DIRECCION', 'ADMINISTRACION'), ctrl.createTemplate);
 router.put('/templates/:id', authorize('DIRECCION', 'ADMINISTRACION'), ctrl.updateTemplate);
-router.delete('/templates/:id', authorize('DIRECCION', 'ADMINISTRACION'), ctrl.deleteTemplate);
+router.delete('/templates/:id', ctrl.deleteTemplate);
 router.post('/templates/bulk-order', authorize('DIRECCION', 'ADMINISTRACION'), ctrl.bulkUpdateOrder);
 
 // Instancias por expediente

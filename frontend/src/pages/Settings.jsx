@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { Mail, Send, Eye, Save, Settings as SettingsIcon, Briefcase, Pencil, Trash2, Plus, X, CheckCircle2, ChevronUp, ChevronDown } from 'lucide-react'
+import { Mail, Send, Eye, Save, Settings as SettingsIcon, Briefcase, Pencil, Trash2, Plus, X, CheckCircle2, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react'
 import api from '../api/client'
 
 const TYPE_LABELS = {
@@ -48,10 +48,141 @@ const PHASE_NAMES = {
   POSVENTA: 'Cierre / Gestión',
 }
 
+// ─── Modal for creating a new checklist phase ───────────────────────────────
+function NewPhaseModal({ operationType, existingPhases, onClose, onCreated }) {
+  const [name, setName] = useState('')
+  const [phase, setPhase] = useState('')
+  const [isCustom, setIsCustom] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  // Phases already used by this operation type
+  const usedPhases = existingPhases.map(t => t.phase)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!name.trim()) return toast.error('El nombre es obligatorio')
+    if (!phase.trim()) return toast.error('La fase técnica es obligatoria')
+    
+    // Convert custom phase to uppercase and snake_case for consistency
+    const technicalPhase = isCustom 
+      ? phase.trim().toUpperCase().replace(/\s+/g, '_')
+      : phase
+
+    setSaving(true)
+    try {
+      await api.post('/checklists/templates', {
+        name: name.trim(),
+        operationType,
+        operationSize: 'INDIVIDUAL',
+        phase: technicalPhase,
+        order: 99,
+        items: [{ label: 'Nueva tarea', required: true }]
+      })
+      toast.success('Nueva fase creada')
+      onCreated()
+      onClose()
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Error al crear la fase')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div
+        className="card w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]">
+          <h3 className="font-bold text-[var(--text-main)]">Nueva fase de checklist</h3>
+          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
+          <div>
+            <label className="label">Nombre público del paso</label>
+            <input
+              type="text"
+              className="input"
+              placeholder="Ej: Documentación adicional"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              autoFocus
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="label mb-0">Fase técnica del proceso</label>
+              <button 
+                type="button" 
+                onClick={() => { setIsCustom(!isCustom); setPhase('') }}
+                className="text-[10px] uppercase font-bold text-blue-600 hover:underline"
+              >
+                {isCustom ? 'Seleccionar existente' : 'Crear nueva clave'}
+              </button>
+            </div>
+            
+            {isCustom ? (
+              <input
+                type="text"
+                className="input font-mono uppercase"
+                placeholder="ID_TECNICO (Ej: NOTARIA_2)"
+                value={phase}
+                onChange={e => setPhase(e.target.value.toUpperCase().replace(/\s+/g, '_'))}
+              />
+            ) : (
+              <select
+                className="select"
+                value={phase}
+                onChange={e => setPhase(e.target.value)}
+              >
+                <option value="">— Selecciona una fase —</option>
+                {Object.entries(PHASE_NAMES).map(([key, label]) => (
+                  <option key={key} value={key}>
+                    {key} — {label}
+                    {usedPhases.includes(key) ? ' (en uso)' : ''}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <p className="text-[10px] text-[var(--text-muted)] italic">
+              * El ID técnico determina dónde se agrupan los checklists en el expediente.
+            </p>
+
+            {phase && usedPhases.includes(phase) && (
+              <div className="flex items-start gap-2 mt-2 p-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg">
+                <AlertCircle size={14} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  Ya existe un flujo para esta fase. Se añadirán estas tareas al expediente en ese mismo punto.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border-color)]">
+            <button type="button" onClick={onClose} className="btn-secondary text-sm">
+              Cancelar
+            </button>
+            <button type="submit" disabled={saving} className="btn-primary text-sm px-6">
+              {saving ? 'Creando...' : 'Crear fase'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('notifications') // 'notifications' | 'operations'
   const [selectedId, setSelectedId] = useState(null)
   const [testEmail, setTestEmail] = useState('')
+  const [newPhaseFor, setNewPhaseFor] = useState(null) // operationType string or null
   const qc = useQueryClient()
 
   const { data: templates, isLoading } = useQuery({
@@ -68,21 +199,6 @@ export default function SettingsPage() {
     mutationFn: () => api.post('/notifications/test', { email: testEmail }),
     onSuccess: () => toast.success(`Email de prueba enviado a ${testEmail}`),
     onError: () => toast.error('Error al enviar email de prueba'),
-  })
-
-  const createPhaseMutation = useMutation({
-    mutationFn: (operationType) => api.post('/checklists/templates', {
-      name: 'Nueva Fase',
-      operationType,
-      operationSize: 'INDIVIDUAL',
-      phase: 'CAPTACION', // Default
-      order: 99, // Will be sorted at the end
-      items: [{ label: 'Tarea inicial', required: true }]
-    }),
-    onSuccess: () => {
-      toast.success('Nueva fase creada')
-      qc.invalidateQueries(['checklist-templates'])
-    }
   })
 
   const selected = templates?.find(t => t.id === selectedId)
@@ -204,7 +320,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <button 
-                      onClick={() => createPhaseMutation.mutate(opKey)}
+                      onClick={() => setNewPhaseFor({ opKey, opTemplates })}
                       className="btn-secondary text-xs py-1.5"
                     >
                       <Plus size={14} /> Nueva Fase
@@ -231,6 +347,16 @@ export default function SettingsPage() {
           )}
         </div>
       )}
+
+      {/* Modal: Nueva Fase */}
+      {newPhaseFor && (
+        <NewPhaseModal
+          operationType={newPhaseFor.opKey}
+          existingPhases={newPhaseFor.opTemplates}
+          onClose={() => setNewPhaseFor(null)}
+          onCreated={() => qc.invalidateQueries(['checklist-templates'])}
+        />
+      )}
     </div>
   )
 }
@@ -253,10 +379,16 @@ function PhaseEditor({ template, order, onRefresh, onMoveUp, onMoveDown, isFirst
   })
 
   const deleteMutation = useMutation({
-    mutationFn: () => api.delete(`/checklists/templates/${template.id}`),
+    mutationFn: () => {
+      console.log('Solicitando borrado de plantilla:', template.id);
+      return api.delete(`/checklists/templates/${template.id}`);
+    },
     onSuccess: () => {
       toast.success('Fase eliminada')
       onRefresh()
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.error || 'No se pudo eliminar la fase. Puede que esté en uso en algún expediente.')
     }
   })
 
@@ -312,10 +444,13 @@ function PhaseEditor({ template, order, onRefresh, onMoveUp, onMoveDown, isFirst
               <Pencil size={14} />
             </button>
             <button 
-              onClick={() => window.confirm('¿Borrar esta fase?') && deleteMutation.mutate()} 
-              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-[var(--sidebar-bg)]"
+              onClick={() => deleteMutation.mutate()} 
+              disabled={deleteMutation.isPending}
+              className={`p-1.5 rounded-lg hover:bg-[var(--sidebar-bg)] transition-colors ${
+                deleteMutation.isPending ? 'opacity-30 cursor-not-allowed' : 'text-gray-400 hover:text-red-600'
+              }`}
             >
-              <Trash2 size={14} />
+              <Trash2 size={14} className={deleteMutation.isPending ? 'animate-pulse' : ''} />
             </button>
           </div>
         </div>
@@ -345,16 +480,14 @@ function PhaseEditor({ template, order, onRefresh, onMoveUp, onMoveDown, isFirst
               value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} 
             />
           </div>
-          <div className="w-48">
-            <label className="text-[10px] font-bold text-blue-600 uppercase mb-1 block">Fase Técnica</label>
-            <select 
-              className="input bg-[var(--card-bg)] text-sm"
-              value={formData.phase} onChange={e => setFormData({...formData, phase: e.target.value})}
-            >
-              {Object.keys(PHASE_NAMES).map(p => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
+          <div className="w-64">
+            <label className="text-[10px] font-bold text-blue-600 uppercase mb-1 block">ID Técnico (Fase)</label>
+            <div className="flex gap-2">
+              <input 
+                type="text" className="input bg-[var(--card-bg)] text-sm font-mono uppercase" 
+                value={formData.phase} onChange={e => setFormData({...formData, phase: e.target.value.toUpperCase().replace(/\s+/g, '_')})} 
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -430,7 +563,7 @@ function TemplateRow({ template, isSelected, onSelect, onSaved }) {
           <p className="font-medium text-sm text-[var(--text-main)]">{TYPE_LABELS[template.type] || template.type}</p>
           <p className="text-xs text-gray-500 mt-0.5 truncate max-w-xl">{template.subject}</p>
         </div>
-        <span className={`badge ${template.active ? 'bg-green-100 text-green-700' : 'bg-[var(--sidebar-bg)] text-gray-500'} text-xs`}>
+        <span className={`badge ${template.active ? 'bg-green-500/20 text-green-400' : 'bg-[var(--sidebar-bg)] text-gray-500'} text-xs`}>
           {template.active ? 'Activa' : 'Inactiva'}
         </span>
       </div>
@@ -454,7 +587,7 @@ function TemplateRow({ template, isSelected, onSelect, onSaved }) {
 
           {preview && (
             <div className="border rounded-lg overflow-hidden">
-              <div className="bg-gray-200 px-3 py-1.5 text-xs text-[var(--text-muted)] font-medium">
+              <div className="bg-[var(--sidebar-bg)] px-3 py-1.5 text-xs text-[var(--text-muted)] font-medium border-b border-[var(--border-color)]">
                 Vista previa: {preview.subject}
               </div>
               <div

@@ -97,24 +97,24 @@ export default function WorkflowStepper({ currentPhase, status, operationType })
             <div key={step.id} className="flex items-center">
               <div className="flex flex-col items-center">
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                  blocked ? 'bg-[var(--sidebar-bg)]0 text-white' :
-                  done    ? 'bg-[var(--sidebar-bg)]0 text-white' :
-                  active  ? 'bg-blue-600 text-white ring-4 ring-blue-100' :
-                            'bg-gray-200 text-gray-500'
+                  blocked ? 'bg-orange-500 text-white' :
+                  done    ? 'bg-green-500 text-white' :
+                  active  ? 'bg-blue-600 text-white ring-4 ring-blue-600/20' :
+                            'bg-[var(--sidebar-bg)] text-[var(--text-muted)] border border-[var(--border-color)]'
                 }`}>
                   {blocked ? <AlertTriangle size={12} /> :
                    done    ? <Check size={12} /> :
                              idx + 1}
                 </div>
                 <span className={`text-[10px] mt-1 whitespace-nowrap ${
-                  active ? 'font-bold text-blue-700' :
-                  done   ? 'text-green-600' : 'text-gray-400'
+                  active  ? 'font-bold text-blue-500' :
+                  done    ? 'text-green-500' : 'text-[var(--text-muted)]'
                 }`}>
                   {step.label}
                 </span>
               </div>
               {idx < visibleSteps.length - 1 && (
-                <div className={`w-6 h-0.5 mx-1 -mt-4 ${done || active ? 'bg-blue-300' : 'bg-gray-200'}`} />
+                <div className={`w-6 h-0.5 mx-1 -mt-4 ${done || active ? 'bg-blue-500/50' : 'bg-[var(--border-color)]'}`} />
               )}
             </div>
           )

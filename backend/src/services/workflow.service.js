@@ -127,54 +127,66 @@ const PHASE_LABELS = {
 /**
  * Determina la siguiente fase basada en el contexto del expediente.
  */
-function getNextPhase(expedient, currentPhase, decision) {
+async function getNextPhase(expedient, currentPhase, decision) {
   // 1. INQUILINO tiene su propio mapa de transiciones
   if (expedient.operationType === 'INQUILINO') {
     const transition = INQUILINO_TRANSITIONS[currentPhase];
-    if (!transition) return null;
-    if (transition.conditional) {
-      if (!decision) return null; // Necesita decisión
-      return decision === 'NO' ? transition.onNo : transition.next;
+    if (transition) {
+      if (transition.conditional) {
+        if (!decision) return null; // Necesita decisión
+        return decision === 'NO' ? transition.onNo : transition.next;
+      }
+      return transition.next;
     }
-    return transition.next;
   }
 
   // 2. PROPIETARIO (Alquiler) tiene su propio mapa
   if (expedient.operationType === 'PROPIETARIO') {
     const transition = PROPIETARIO_TRANSITIONS[currentPhase];
-    if (!transition) return null;
-    return transition.next;
+    if (transition) return transition.next;
   }
 
   // 3. INVERSION_HOLDERS
   if (expedient.operationType === 'INVERSION_HOLDERS') {
     const transition = INVERSION_TRANSITIONS[currentPhase];
-    if (!transition) return null;
-    return transition.next;
+    if (transition) return transition.next;
   }
 
+  // 4. Mapa estándar
   const transition = TRANSITIONS[currentPhase];
-  if (!transition) return null;
-
-  // LÓGICA ESPECIAL POR TIPO DE OPERACIÓN
-  
-  // 1. CAPTACION -> Siguiente
-  if (currentPhase === 'CAPTACION') {
-    // Si es COMPRA, saltamos VALORACION (un comprador no valora su propia casa para venderla)
-    if (expedient.operationType === 'COMPRA') {
+  if (transition) {
+    if (currentPhase === 'CAPTACION' && expedient.operationType === 'COMPRA') {
       return 'FORMULARIO';
     }
-  }
-
-  // 2. Fases condicionales estándar
-  if (transition.conditional) {
-    if (decision === 'NO') {
-      return transition.onNo;
+    if (transition.conditional) {
+      if (decision === 'NO') return transition.onNo;
+      return transition.next;
     }
     return transition.next;
   }
 
-  return transition.next;
+  // 5. LÓGICA DINÁMICA: Si no está en los mapas hardcoded, buscamos por orden de plantillas
+  const templates = await prisma.checklistTemplate.findMany({
+    where: { operationType: expedient.operationType, active: true },
+    orderBy: { order: 'asc' },
+  });
+
+  // Agrupamos por fase única (ya que puede haber múltiples templates por fase)
+  const uniquePhases = [];
+  const seen = new Set();
+  for (const t of templates) {
+    if (!seen.has(t.phase)) {
+      uniquePhases.push(t.phase);
+      seen.add(t.phase);
+    }
+  }
+
+  const currentIdx = uniquePhases.indexOf(currentPhase);
+  if (currentIdx !== -1 && currentIdx < uniquePhases.length - 1) {
+    return uniquePhases[currentIdx + 1];
+  }
+
+  return null;
 }
 
 /**
@@ -256,7 +268,7 @@ async function advance(expedient, user, notes, decision) {
     expedient: updated,
     fromPhase: currentPhase,
     toPhase: nextPhase,
-    label: PHASE_LABELS[nextPhase],
+    label: PHASE_LABELS[nextPhase] || nextPhase,
   };
 }
 

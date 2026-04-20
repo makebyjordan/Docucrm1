@@ -35,7 +35,7 @@ export default function Sidebar() {
           <Building2 size={18} className="text-white" />
         </div>
         <div>
-          <p style={{ color: 'var(--sidebar-text)' }} className="font-bold text-sm leading-tight">CRM Inmobiliaria</p>
+          <p style={{ color: 'var(--sidebar-text)' }} className="font-bold text-sm leading-tight">InmoHabitat</p>
           <p style={{ color: 'var(--sidebar-text-muted)' }} className="text-xs">Gestión documental</p>
         </div>
       </div>
@@ -51,7 +51,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? 'shadow-lg shadow-red-500/20'
+                    ? 'shadow-md shadow-[var(--primary-glow)]'
                     : 'hover:bg-[var(--sidebar-hover)]'
                 }`
               }
@@ -78,7 +78,7 @@ export default function Sidebar() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 isActive
-                  ? 'shadow-lg shadow-red-500/20'
+                  ? 'shadow-md shadow-[var(--primary-glow)]'
                   : 'hover:bg-[var(--sidebar-hover)]'
               }`
             }

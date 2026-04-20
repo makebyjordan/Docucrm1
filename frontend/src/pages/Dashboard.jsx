@@ -16,33 +16,37 @@ const PHASE_LABELS = {
 }
 
 const TYPE_COLORS = {
-  VENTA: '#3b82f6', INQUILINO: '#10b981', COMPRA: '#f59e0b',
-  PROPIETARIO: '#f97316', INVERSION_HOLDERS: '#8b5cf6',
+  VENTA: '#3b82f6', // Blue
+  INQUILINO: '#10b981', // Emerald
+  COMPRA: '#f59e0b', // Amber
+  PROPIETARIO: '#f97316', // Orange
+  INVERSION_HOLDERS: '#6366f1', // Indigo
 }
 
 const STATUS_COLORS = { ACTIVO: '#10b981', BLOQUEADO: '#ef4444', COMPLETADO: '#3b82f6' }
 
 function StatCard({ icon: Icon, label, value, color = 'blue', sub }) {
   const colors = {
-    blue: { bg: 'rgba(38, 99, 235, 0.1)', text: 'var(--secondary-color)' },
+    blue: { bg: 'var(--primary-glow)', text: 'var(--primary-color)' },
     green: { bg: 'rgba(16, 185, 129, 0.1)', text: '#10b981' },
-    red: { bg: 'rgba(225, 29, 72, 0.1)', text: 'var(--primary-color)' },
+    red: { bg: 'rgba(239, 68, 68, 0.1)', text: '#ef4444' },
     yellow: { bg: 'rgba(245, 158, 11, 0.1)', text: '#f59e0b' },
+    indigo: { bg: 'rgba(99, 102, 241, 0.1)', text: 'var(--secondary-color)' },
   }
   const themeColor = colors[color] || colors.blue;
 
   return (
-    <div className="card p-5 flex items-start gap-4 transition-all hover:scale-[1.02] duration-300">
+    <div className="card p-6 flex items-start gap-5 hover:translate-y-[-4px] hover:shadow-xl transition-all duration-300 group">
       <div 
-        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+        className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-110"
         style={{ backgroundColor: themeColor.bg, color: themeColor.text }}
       >
-        <Icon size={20} />
+        <Icon size={24} />
       </div>
       <div className="min-w-0">
-        <p style={{ color: 'var(--text-main)' }} className="text-2xl font-bold">{value}</p>
-        <p style={{ color: 'var(--text-muted)' }} className="text-sm font-medium">{label}</p>
-        {sub && <p style={{ color: 'var(--tertiary-color)' }} className="text-xs mt-0.5">{sub}</p>}
+        <p style={{ color: 'var(--text-main)' }} className="text-2xl font-extrabold tracking-tight">{value}</p>
+        <p style={{ color: 'var(--text-muted)' }} className="text-sm font-semibold uppercase tracking-wider">{label}</p>
+        {sub && <p style={{ color: 'var(--tertiary-color)' }} className="text-xs mt-1 leading-relaxed">{sub}</p>}
       </div>
     </div>
   )
@@ -178,11 +182,13 @@ export default function DashboardPage() {
         {activity?.recentPhaseChanges?.length > 0 ? (
           <div className="space-y-2">
             {activity.recentPhaseChanges.map(change => (
-              <div key={change.id} className="flex items-center gap-3 text-sm py-2 border-b border-[var(--border-color)] last:border-0">
-                <div className="w-2 h-2 rounded-full bg-[var(--sidebar-bg)]0 shrink-0" />
-                <span className="font-mono text-[var(--text-muted)] text-xs">{change.expedient?.code}</span>
-                <span className="text-gray-500 flex-1">
-                  {PHASE_LABELS[change.fromPhase] || change.fromPhase} → <strong>{PHASE_LABELS[change.toPhase] || change.toPhase}</strong>
+              <div key={change.id} className="flex items-center gap-3 text-sm py-3 border-b border-[var(--border-color)] last:border-0 group">
+                <div className="w-2 h-2 rounded-full bg-[var(--primary-color)] opacity-40 shrink-0 group-hover:opacity-100 transition-opacity" />
+                <span className="font-mono text-[var(--text-muted)] text-xs font-bold">{change.expedient?.code}</span>
+                <span className="text-[var(--text-main)] flex-1">
+                  <span className="text-[var(--text-muted)]">{PHASE_LABELS[change.fromPhase] || change.fromPhase}</span>
+                  <span className="mx-2 opacity-30">→</span>
+                  <strong className="text-[var(--primary-color)]">{PHASE_LABELS[change.toPhase] || change.toPhase}</strong>
                 </span>
                 <span className="text-gray-400 text-xs">
                   {change.changedBy?.name || 'Sistema'}

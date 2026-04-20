@@ -40,30 +40,31 @@ export default function Header() {
 
   return (
     <header 
-      style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)' }}
-      className="border-b px-6 py-4 flex items-center justify-between shrink-0 transition-colors duration-300"
+      className="glass sticky top-0 z-10 px-6 py-4 flex items-center justify-between shrink-0 transition-all duration-300"
     >
-      <h1 style={{ color: 'var(--text-main)' }} className="text-xl font-semibold">{title}</h1>
-      <div className="flex items-center gap-3">
+      <h1 style={{ color: 'var(--text-main)' }} className="text-xl font-bold tracking-tight">{title}</h1>
+      <div className="flex items-center gap-4">
         <button
           onClick={() => setIsDark(!isDark)}
-          className="p-2 rounded-lg hover:bg-[var(--bg-color)] transition-colors"
+          className="p-2.5 rounded-xl hover:bg-[var(--sidebar-hover)] transition-all border border-transparent hover:border-[var(--border-color)]"
           style={{ color: 'var(--text-muted)' }}
           title={isDark ? 'Modo claro' : 'Modo oscuro'}
         >
-          {isDark ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} />}
+          {isDark ? <Sun size={19} className="text-yellow-400" /> : <Moon size={19} className="text-slate-600" />}
         </button>
 
         {pathname === '/expedients' && (
-          <Link to="/expedients/new" className="btn-primary">
+          <Link to="/expedients/new" className="btn-primary py-2.5">
             <Plus size={16} />
             Nuevo expediente
           </Link>
         )}
+        
+        <div className="h-6 w-px bg-[var(--border-color)] mx-1" />
+
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 text-sm transition-colors px-3 py-2 rounded-lg hover:bg-[var(--bg-color)]"
-          style={{ color: 'var(--text-muted)' }}
+          className="flex items-center gap-2 text-sm font-medium transition-all px-4 py-2.5 rounded-xl hover:bg-red-500/10 text-red-500 hover:shadow-sm"
         >
           <LogOut size={16} />
           Salir

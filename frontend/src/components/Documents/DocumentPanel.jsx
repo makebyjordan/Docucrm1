@@ -359,7 +359,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                         <Icon size={16} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-800 truncate">{doc.name}</p>
+                        <p className="text-sm font-semibold text-[var(--text-main)] truncate">{doc.name}</p>
                         <div className="flex items-center gap-3 mt-0.5">
                           <span className={`text-[10px] font-bold ${cfg.color.split(' ')[0]}`}>{cfg.label}</span>
                           <span className="text-[10px] text-gray-400 capitalize">{doc.phase.toLowerCase()}</span>
