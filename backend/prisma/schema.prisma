@@ -97,11 +97,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  assignments       ExpedientAssignment[]
-  uploadedDocuments Document[]
-  notifications     Notification[]
-  phaseChanges      PhaseHistory[]
-  calendarEvents    CalendarEvent[]
+  assignments          ExpedientAssignment[]
+  uploadedDocuments    Document[]
+  notifications        Notification[]
+  phaseChanges         PhaseHistory[]
+  calendarEvents       CalendarEvent[]
+  documentValidations  DocumentValidation[]
+  expedientLinks       ExpedientLink[]
 
   @@map("users")
 }
@@ -131,6 +133,7 @@ model Client {
   expedients     Expedient[]
   roles          ExpedientClient[]
   calendarEvents CalendarEvent[]
+  journey        ClientJourney?
 
   @@map("clients")
 }
@@ -194,6 +197,20 @@ model Expedient {
   valuationEstimated   Decimal?  @db.Decimal(12, 2)
   valuationMarketNotes String?
 
+  // Expedientes vinculados (captación ↔ venta, propietario ↔ inquilino)
+  parentExpedientId   String?
+  expedientRole       String?   // "CAPTACION" | "VENTA" | "COMPRA" | "PROPIETARIO" | "INQUILINO"
+
+  // Gastos de operación (notaría, registro, impuestos)
+  notaryFees          Decimal?  @db.Decimal(10, 2)
+  registryFees        Decimal?  @db.Decimal(10, 2)
+  taxesAmount         Decimal?  @db.Decimal(10, 2)
+
+  // Sistema de vinculaciones avanzadas
+  linkedOperationType String?   // "PERMUTA" | "CADENA" | "CONDICIONADO" | "RELACIONADO"
+  dependencyStatus    String?   // "INDEPENDIENTE" | "BLOQUEADO_LINK" | "CONDICIONADO" | "DESBLOQUEADO"
+  advanceConditions   Json?     // { "requiresExpedient": "id", "minPhase": "ARRAS" }
+
   client         Client                @relation(fields: [clientId], references: [id])
   clientRoles    ExpedientClient[]
   assignments    ExpedientAssignment[]
@@ -206,7 +223,51 @@ model Expedient {
   visits         Visit[]
   calendarEvents CalendarEvent[]
 
+  // Jerarquía simple (captación padre / venta hijo)
+  parentExpedient Expedient?  @relation("ExpedientHierarchy", fields: [parentExpedientId], references: [id])
+  childExpedients Expedient[] @relation("ExpedientHierarchy")
+
+  // Vinculaciones avanzadas (muchos a muchos)
+  outgoingLinks   ExpedientLink[] @relation("ExpedientLinks")
+  incomingLinks   ExpedientLink[] @relation("LinkedExpedients")
+
   @@map("expedients")
+}
+
+// ─── Vinculaciones entre expedientes ─────────────────────────────────────────
+model ExpedientLink {
+  id                String   @id @default(cuid())
+  expedientId       String
+  linkedExpedientId String
+  linkType          String   // "VENDE_PARA_COMPRAR" | "COMPRA_PARA_VENDER" | "PERMUTA_MUTUA" | "CADENA" | "RELACIONADO"
+  linkDirection     String   @default("UNIDIRECCIONAL") // "BIDIRECCIONAL" | "UNIDIRECCIONAL"
+  condition         String?  // Descripción libre de la condición
+  isBlocking        Boolean  @default(false)
+  requiredPhase     String?  // Fase mínima requerida del expediente vinculado
+  notes             String?
+  createdBy         String
+  createdAt         DateTime @default(now())
+
+  expedient       Expedient @relation("ExpedientLinks",   fields: [expedientId],       references: [id], onDelete: Cascade)
+  linkedExpedient Expedient @relation("LinkedExpedients", fields: [linkedExpedientId], references: [id], onDelete: Cascade)
+  creator         User      @relation(fields: [createdBy], references: [id])
+
+  @@unique([expedientId, linkedExpedientId])
+  @@map("expedient_links")
+}
+
+// ─── Journey del cliente a través de expedientes ─────────────────────────────
+model ClientJourney {
+  id         String   @id @default(cuid())
+  clientId   String   @unique
+  expedients Json     @default("[]")
+  totalValue Decimal? @db.Decimal(15, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("client_journeys")
 }
 
 model ExpedientClient {
@@ -372,10 +433,27 @@ model Document {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  expedient  Expedient @relation(fields: [expedientId], references: [id], onDelete: Cascade)
-  uploadedBy User?     @relation(fields: [uploadedById], references: [id])
+  expedient   Expedient            @relation(fields: [expedientId], references: [id], onDelete: Cascade)
+  uploadedBy  User?                @relation(fields: [uploadedById], references: [id])
+  validations DocumentValidation[]
 
   @@map("documents")
+}
+
+model DocumentValidation {
+  id          String   @id @default(cuid())
+  documentId  String
+  validatedBy String
+  validatedAt DateTime @default(now())
+  status      String   // "APROBADO" | "RECHAZADO" | "REQUIERE_CAMBIOS"
+  comments    String?
+  expiryDate  DateTime?
+  createdAt   DateTime @default(now())
+
+  document  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  validator User     @relation(fields: [validatedBy], references: [id])
+
+  @@map("document_validations")
 }
 
 model Signature {

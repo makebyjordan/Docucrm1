@@ -102,6 +102,94 @@ const INVERSION_TRANSITIONS = {
   POSVENTA:              { next: 'CERRADO' },
 };
 
+/**
+ * Flujo VENTA - Lado Captación/Vendedor (expedientRole = 'CAPTACION')
+ * 6 fases: desde la captación del inmueble hasta la publicación del activo
+ */
+const VENTA_CAPTACION_TRANSITIONS = {
+  CAPTACION_INMUEBLE:     { next: 'VALORACION_MERCADO' },
+  VALORACION_MERCADO:     { next: 'MANDATO_EXCLUSIVA' },
+  MANDATO_EXCLUSIVA:      { next: 'DOCUMENTACION_LEGAL' },
+  DOCUMENTACION_LEGAL:    { next: 'PREPARACION_MARKETING' },
+  PREPARACION_MARKETING:  { next: 'PUBLICACION_ACTIVO' },
+  PUBLICACION_ACTIVO:     { next: 'CERRADO' },
+};
+
+/**
+ * Flujo VENTA - Lado Comprador/Negociación (expedientRole = 'VENTA' o 'COMPRA')
+ * 10 fases: desde la captación del comprador hasta la postventa
+ */
+const VENTA_COMPRADOR_TRANSITIONS = {
+  CAPTACION_COMPRADOR:   { next: 'GESTION_VISITAS' },
+  GESTION_VISITAS:       { next: 'NEGOCIACION_PRECIO' },
+  NEGOCIACION_PRECIO:    { next: 'RESERVA_SENAL' },
+  RESERVA_SENAL:         { next: 'ARRAS_PRIVADO' },
+  ARRAS_PRIVADO:         {
+    next: 'GESTION_HIPOTECA',
+    conditional: true,
+    onNo: 'PREPARACION_NOTARIA',
+  },
+  GESTION_HIPOTECA:      { next: 'PREPARACION_NOTARIA' },
+  PREPARACION_NOTARIA:   { next: 'FIRMA_ESCRITURA' },
+  FIRMA_ESCRITURA:       { next: 'CIERRE_REGISTRO' },
+  CIERRE_REGISTRO:       { next: 'POSTVENTA_SEGUIMIENTO' },
+  POSTVENTA_SEGUIMIENTO: { next: 'CERRADO' },
+};
+
+/**
+ * Flujo ALQUILER - Lado Propietario (expedientRole = 'PROPIETARIO_ALQUILER')
+ * 6 fases: captación del inmueble hasta la gestión de visitas
+ */
+const ALQUILER_PROPIETARIO_TRANSITIONS = {
+  CAPTACION_PROPIEDAD:  { next: 'VALORACION_RENTA' },
+  VALORACION_RENTA:     { next: 'MANDATO_ALQUILER' },
+  MANDATO_ALQUILER:     { next: 'DOCUMENTACION_INMUEBLE' },
+  DOCUMENTACION_INMUEBLE: { next: 'MARKETING_DIFUSION' },
+  MARKETING_DIFUSION:   { next: 'GESTION_VISITAS_ALQ' },
+  GESTION_VISITAS_ALQ:  { next: 'CERRADO' },
+};
+
+/**
+ * Flujo ALQUILER - Lado Inquilino (expedientRole = 'INQUILINO_ALQUILER')
+ * 8 fases: captación del inquilino hasta la gestión mensual
+ */
+const ALQUILER_INQUILINO_TRANSITIONS = {
+  CAPTACION_INQUILINO:      { next: 'PRESENTACION_INMUEBLES' },
+  PRESENTACION_INMUEBLES:   { next: 'DOCUMENTACION_SOLVENCIA' },
+  DOCUMENTACION_SOLVENCIA:  { next: 'VALIDACION_ECONOMICA' },
+  VALIDACION_ECONOMICA:     {
+    next: 'NEGOCIACION_CONDICIONES',
+    conditional: true,
+    onNo: 'BLOQUEADO',
+  },
+  NEGOCIACION_CONDICIONES:  { next: 'CONTRATO_ALQUILER' },
+  CONTRATO_ALQUILER:        { next: 'ENTREGA_INMUEBLE' },
+  ENTREGA_INMUEBLE:         { next: 'GESTION_MENSUAL' },
+  GESTION_MENSUAL:          { next: 'CERRADO' },
+};
+
+/**
+ * Flujo INVERSIÓN - Completo (operationType = INVERSION con expedientRole = 'INVERSION')
+ * 11 fases: perfilado inversor hasta gestión post-compra
+ */
+const INVERSION_COMPLETO_TRANSITIONS = {
+  PERFILADO_INVERSOR:    { next: 'KYC_SOLVENCIA' },
+  KYC_SOLVENCIA:         { next: 'BUSQUEDA_ACTIVOS' },
+  BUSQUEDA_ACTIVOS:      { next: 'ANALISIS_FINANCIERO' },
+  ANALISIS_FINANCIERO:   { next: 'DUE_DILIGENCE' },
+  DUE_DILIGENCE:         { next: 'NEGOCIACION_INV' },
+  NEGOCIACION_INV:       { next: 'RESERVA_ACTIVO' },
+  RESERVA_ACTIVO:        { next: 'ARRAS_INVERSION' },
+  ARRAS_INVERSION:       {
+    next: 'FINANCIACION_INV',
+    conditional: true,
+    onNo: 'CIERRE_COMPRA',
+  },
+  FINANCIACION_INV:      { next: 'CIERRE_COMPRA' },
+  CIERRE_COMPRA:         { next: 'GESTION_POST_COMPRA' },
+  GESTION_POST_COMPRA:   { next: 'CERRADO' },
+};
+
 const PHASE_LABELS = {
   CAPTACION: 'Captación',
   VALORACION: 'Valoración',
@@ -124,54 +212,107 @@ const PHASE_LABELS = {
   CERRADO: 'Finalizado',
 };
 
+// Etiquetas para los nuevos flujos de fases
+const NEW_PHASE_LABELS = {
+  CAPTACION_INMUEBLE:     'Captación del inmueble',
+  VALORACION_MERCADO:     'Valoración de mercado',
+  MANDATO_EXCLUSIVA:      'Mandato / Exclusiva',
+  DOCUMENTACION_LEGAL:    'Documentación legal',
+  PREPARACION_MARKETING:  'Preparación marketing',
+  PUBLICACION_ACTIVO:     'Publicación del activo',
+  CAPTACION_COMPRADOR:    'Captación comprador',
+  GESTION_VISITAS:        'Gestión de visitas',
+  NEGOCIACION_PRECIO:     'Negociación de precio',
+  RESERVA_SENAL:          'Reserva / Señal',
+  ARRAS_PRIVADO:          'Contrato de arras',
+  GESTION_HIPOTECA:       'Gestión hipotecaria',
+  PREPARACION_NOTARIA:    'Preparación notaría',
+  FIRMA_ESCRITURA:        'Firma escritura',
+  CIERRE_REGISTRO:        'Cierre y registro',
+  POSTVENTA_SEGUIMIENTO:  'Seguimiento postventa',
+  CAPTACION_PROPIEDAD:    'Captación de propiedad',
+  VALORACION_RENTA:       'Valoración de renta',
+  MANDATO_ALQUILER:       'Mandato de alquiler',
+  DOCUMENTACION_INMUEBLE: 'Documentación inmueble',
+  MARKETING_DIFUSION:     'Marketing y difusión',
+  GESTION_VISITAS_ALQ:    'Gestión de visitas',
+  CAPTACION_INQUILINO:    'Captación inquilino',
+  PRESENTACION_INMUEBLES: 'Presentación inmuebles',
+  DOCUMENTACION_SOLVENCIA:'Documentación solvencia',
+  VALIDACION_ECONOMICA:   'Validación económica',
+  NEGOCIACION_CONDICIONES:'Negociación condiciones',
+  CONTRATO_ALQUILER:      'Contrato de alquiler',
+  ENTREGA_INMUEBLE:       'Entrega del inmueble',
+  GESTION_MENSUAL:        'Gestión mensual',
+  PERFILADO_INVERSOR:     'Perfilado del inversor',
+  KYC_SOLVENCIA:          'KYC y solvencia',
+  BUSQUEDA_ACTIVOS:       'Búsqueda de activos',
+  ANALISIS_FINANCIERO:    'Análisis financiero',
+  DUE_DILIGENCE:          'Due diligence',
+  NEGOCIACION_INV:        'Negociación',
+  RESERVA_ACTIVO:         'Reserva de activo',
+  ARRAS_INVERSION:        'Arras inversión',
+  FINANCIACION_INV:       'Financiación',
+  CIERRE_COMPRA:          'Cierre de compra',
+  GESTION_POST_COMPRA:    'Gestión post-compra',
+};
+
+const ALL_PHASE_LABELS = { ...PHASE_LABELS, ...NEW_PHASE_LABELS };
+
+const PHASE_GROUPS = {
+  CAPTACION: ['CAPTACION_INMUEBLE','VALORACION_MERCADO','MANDATO_EXCLUSIVA','DOCUMENTACION_LEGAL','PREPARACION_MARKETING','PUBLICACION_ACTIVO'],
+  VENTA: ['CAPTACION_COMPRADOR','GESTION_VISITAS','NEGOCIACION_PRECIO','RESERVA_SENAL','ARRAS_PRIVADO','GESTION_HIPOTECA','PREPARACION_NOTARIA','FIRMA_ESCRITURA','CIERRE_REGISTRO','POSTVENTA_SEGUIMIENTO'],
+  PROPIETARIO_ALQUILER: ['CAPTACION_PROPIEDAD','VALORACION_RENTA','MANDATO_ALQUILER','DOCUMENTACION_INMUEBLE','MARKETING_DIFUSION','GESTION_VISITAS_ALQ'],
+  INQUILINO_ALQUILER: ['CAPTACION_INQUILINO','PRESENTACION_INMUEBLES','DOCUMENTACION_SOLVENCIA','VALIDACION_ECONOMICA','NEGOCIACION_CONDICIONES','CONTRATO_ALQUILER','ENTREGA_INMUEBLE','GESTION_MENSUAL'],
+  INVERSION: ['PERFILADO_INVERSOR','KYC_SOLVENCIA','BUSQUEDA_ACTIVOS','ANALISIS_FINANCIERO','DUE_DILIGENCE','NEGOCIACION_INV','RESERVA_ACTIVO','ARRAS_INVERSION','FINANCIACION_INV','CIERRE_COMPRA','GESTION_POST_COMPRA'],
+};
+
+/**
+ * Selecciona el mapa de transiciones correcto según tipo y rol del expediente.
+ */
+function selectTransitionMap(expedient) {
+  const role = expedient.expedientRole;
+
+  // Flujos nuevos basados en expedientRole
+  if (role === 'CAPTACION')           return VENTA_CAPTACION_TRANSITIONS;
+  if (role === 'VENTA' || role === 'COMPRA') return VENTA_COMPRADOR_TRANSITIONS;
+  if (role === 'PROPIETARIO_ALQUILER') return ALQUILER_PROPIETARIO_TRANSITIONS;
+  if (role === 'INQUILINO_ALQUILER')  return ALQUILER_INQUILINO_TRANSITIONS;
+  if (role === 'INVERSION')           return INVERSION_COMPLETO_TRANSITIONS;
+
+  // Flujos legacy por operationType
+  if (expedient.operationType === 'INQUILINO')         return INQUILINO_TRANSITIONS;
+  if (expedient.operationType === 'PROPIETARIO')       return PROPIETARIO_TRANSITIONS;
+  if (expedient.operationType === 'INVERSION_HOLDERS') return INVERSION_TRANSITIONS;
+
+  return TRANSITIONS;
+}
+
 /**
  * Determina la siguiente fase basada en el contexto del expediente.
  */
 async function getNextPhase(expedient, currentPhase, decision) {
-  // 1. INQUILINO tiene su propio mapa de transiciones
-  if (expedient.operationType === 'INQUILINO') {
-    const transition = INQUILINO_TRANSITIONS[currentPhase];
-    if (transition) {
-      if (transition.conditional) {
-        if (!decision) return null; // Necesita decisión
-        return decision === 'NO' ? transition.onNo : transition.next;
-      }
-      return transition.next;
-    }
-  }
+  const transitionMap = selectTransitionMap(expedient);
+  const transition = transitionMap[currentPhase];
 
-  // 2. PROPIETARIO (Alquiler) tiene su propio mapa
-  if (expedient.operationType === 'PROPIETARIO') {
-    const transition = PROPIETARIO_TRANSITIONS[currentPhase];
-    if (transition) return transition.next;
-  }
-
-  // 3. INVERSION_HOLDERS
-  if (expedient.operationType === 'INVERSION_HOLDERS') {
-    const transition = INVERSION_TRANSITIONS[currentPhase];
-    if (transition) return transition.next;
-  }
-
-  // 4. Mapa estándar
-  const transition = TRANSITIONS[currentPhase];
   if (transition) {
-    if (currentPhase === 'CAPTACION' && expedient.operationType === 'COMPRA') {
-      return 'FORMULARIO';
-    }
     if (transition.conditional) {
-      if (decision === 'NO') return transition.onNo;
-      return transition.next;
+      if (!decision) return null;
+      return decision === 'NO' ? transition.onNo : transition.next;
+    }
+    // Excepción legacy: COMPRA salta valoración
+    if (currentPhase === 'CAPTACION' && expedient.operationType === 'COMPRA' && !expedient.expedientRole) {
+      return 'FORMULARIO';
     }
     return transition.next;
   }
 
-  // 5. LÓGICA DINÁMICA: Si no está en los mapas hardcoded, buscamos por orden de plantillas
+  // LÓGICA DINÁMICA: buscar por orden de plantillas si no hay mapa hardcoded
   const templates = await prisma.checklistTemplate.findMany({
     where: { operationType: expedient.operationType, active: true },
     orderBy: { order: 'asc' },
   });
 
-  // Agrupamos por fase única (ya que puede haber múltiples templates por fase)
   const uniquePhases = [];
   const seen = new Set();
   for (const t of templates) {
@@ -198,13 +339,8 @@ async function getNextPhase(expedient, currentPhase, decision) {
  */
 async function advance(expedient, user, notes, decision) {
   const currentPhase = expedient.currentPhase;
-  const { operationType } = expedient;
-  
-  let transitionMap = TRANSITIONS;
-  if (operationType === 'INQUILINO') transitionMap = INQUILINO_TRANSITIONS;
-  if (operationType === 'PROPIETARIO') transitionMap = PROPIETARIO_TRANSITIONS;
-  if (operationType === 'INVERSION_HOLDERS') transitionMap = INVERSION_TRANSITIONS;
 
+  const transitionMap = selectTransitionMap(expedient);
   const transition = transitionMap[currentPhase];
 
   if (!transition) {
@@ -216,6 +352,16 @@ async function advance(expedient, user, notes, decision) {
   if (!checklistOk) {
     return { error: 'Hay ítems obligatorios del checklist sin completar en esta fase.' };
   }
+
+  // Verificar bloqueos por expedientes vinculados
+  try {
+    const { validateAdvanceWithLinks } = require('./expedientLinksValidator.service')
+    const blockers = await validateAdvanceWithLinks(expedient.id)
+    if (blockers.length > 0) {
+      const msg = blockers.map(b => `${b.code} debe estar en ${b.requiredPhase} (ahora: ${b.currentPhase})`).join('; ')
+      return { error: `Avance bloqueado por expedientes vinculados: ${msg}` }
+    }
+  } catch (_) { /* no bloquear si el módulo no existe */ }
 
   // Determinar la siguiente fase inteligentemente
   let nextPhase = getNextPhase(expedient, currentPhase, decision);
@@ -262,6 +408,12 @@ async function advance(expedient, user, notes, decision) {
   // Disparar notificaciones según la transición
   await notificationEngine.onPhaseTransition(updated, currentPhase, nextPhase, decision);
 
+  // Notificar a expedientes que tenían este como bloqueo y ya están desbloqueados
+  try {
+    const { checkAndNotifyUnblockedLinks } = require('./expedientLinksValidator.service')
+    await checkAndNotifyUnblockedLinks(expedient.id, nextPhase, prisma)
+  } catch (_) {}
+
   logger.info(`[Workflow] Expediente ${expedient.code}: ${currentPhase} → ${nextPhase}`);
 
   return {
@@ -272,4 +424,4 @@ async function advance(expedient, user, notes, decision) {
   };
 }
 
-module.exports = { advance, PHASE_LABELS, TRANSITIONS };
+module.exports = { advance, PHASE_LABELS, ALL_PHASE_LABELS, NEW_PHASE_LABELS, PHASE_GROUPS, TRANSITIONS };

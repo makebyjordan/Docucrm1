@@ -2,10 +2,128 @@ import { useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import {
-  Upload, FileText, CheckCircle, XCircle, Clock,
-  Download, Trash2, ExternalLink, Info, AlertCircle, Eye, Plus
+  Upload, FileText, CheckCircle, XCircle,
+  Download, Trash2, ExternalLink, Info, AlertCircle, Eye, Plus,
+  History, Calendar,
 } from 'lucide-react'
 import api from '../../api/client'
+
+// ─── Historial de validaciones de un documento ───────────────────────────────
+function DocumentValidationHistory({ docId, onClose }) {
+  const qc = useQueryClient()
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ status: 'APROBADO', comments: '', expiryDate: '' })
+
+  const { data: validations = [], isLoading } = useQuery({
+    queryKey: ['doc-validations', docId],
+    queryFn: () => api.get(`/document-validations/document/${docId}`).then(r => r.data),
+  })
+
+  const createMutation = useMutation({
+    mutationFn: (data) => api.post(`/document-validations/document/${docId}`, data),
+    onSuccess: () => {
+      toast.success('Validación registrada')
+      qc.invalidateQueries(['doc-validations', docId])
+      qc.invalidateQueries(['documents'])
+      setShowForm(false)
+      setForm({ status: 'APROBADO', comments: '', expiryDate: '' })
+    },
+    onError: (err) => toast.error(err.response?.data?.error || 'Error al registrar'),
+  })
+
+  const STATUS_LABELS = {
+    APROBADO: { label: 'Aprobado', color: 'text-green-400', bg: 'bg-green-500/10' },
+    RECHAZADO: { label: 'Rechazado', color: 'text-red-400', bg: 'bg-red-500/10' },
+    REQUIERE_CAMBIOS: { label: 'Requiere cambios', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
+  }
+
+  return (
+    <div className="mt-2 border border-[var(--border-color)] rounded-xl bg-[var(--bg-color)] p-3">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide">Historial de validación</p>
+        <div className="flex gap-2">
+          <button onClick={() => setShowForm(!showForm)} className="text-[10px] text-[var(--primary-color)] hover:underline">
+            + Nueva validación
+          </button>
+          <button onClick={onClose} className="text-[10px] text-gray-400 hover:text-red-500">Cerrar</button>
+        </div>
+      </div>
+
+      {showForm && (
+        <div className="mb-3 p-3 rounded-lg border border-[var(--border-color)] bg-[var(--card-bg)] space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="label text-[10px]">Estado</label>
+              <select className="select text-xs py-1" value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}>
+                <option value="APROBADO">Aprobado</option>
+                <option value="RECHAZADO">Rechazado</option>
+                <option value="REQUIERE_CAMBIOS">Requiere cambios</option>
+              </select>
+            </div>
+            <div>
+              <label className="label text-[10px]">Fecha caducidad</label>
+              <input type="date" className="input text-xs py-1" value={form.expiryDate}
+                onChange={e => setForm(f => ({ ...f, expiryDate: e.target.value }))} />
+            </div>
+          </div>
+          <div>
+            <label className="label text-[10px]">Comentarios</label>
+            <textarea className="input text-xs" rows={2} value={form.comments}
+              onChange={e => setForm(f => ({ ...f, comments: e.target.value }))}
+              placeholder="Observaciones opcionales..." />
+          </div>
+          <div className="flex justify-end gap-2">
+            <button onClick={() => setShowForm(false)} className="btn-secondary py-1 px-2 text-xs">Cancelar</button>
+            <button
+              onClick={() => createMutation.mutate({ ...form, expiryDate: form.expiryDate || undefined })}
+              disabled={createMutation.isPending}
+              className="btn-primary py-1 px-2 text-xs"
+            >
+              {createMutation.isPending ? 'Guardando...' : 'Guardar'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isLoading && <p className="text-xs text-gray-400 py-2">Cargando...</p>}
+
+      {!isLoading && validations.length === 0 && (
+        <p className="text-xs text-gray-400 py-2 text-center">Sin validaciones registradas</p>
+      )}
+
+      <div className="space-y-1.5">
+        {validations.map(v => {
+          const cfg = STATUS_LABELS[v.status] || { label: v.status, color: 'text-gray-400', bg: 'bg-gray-500/10' }
+          const isExpired = v.expiryDate && new Date(v.expiryDate) < new Date()
+          return (
+            <div key={v.id} className={`flex gap-2 p-2 rounded-lg ${cfg.bg}`}>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`text-[10px] font-bold ${cfg.color}`}>{cfg.label}</span>
+                  <span className="text-[10px] text-gray-400">
+                    {new Date(v.validatedAt).toLocaleDateString('es-ES')}
+                  </span>
+                  {v.validator && (
+                    <span className="text-[10px] text-gray-400">· {v.validator.name}</span>
+                  )}
+                  {v.expiryDate && (
+                    <span className={`text-[10px] flex items-center gap-0.5 ${isExpired ? 'text-red-400 font-bold' : 'text-gray-400'}`}>
+                      <Calendar size={9} />
+                      {isExpired ? 'CADUCADO' : `Cad. ${new Date(v.expiryDate).toLocaleDateString('es-ES')}`}
+                    </span>
+                  )}
+                </div>
+                {v.comments && (
+                  <p className="text-[10px] text-gray-500 mt-0.5 italic">{v.comments}</p>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 const STATUS_CONFIG = {
   PENDIENTE: { label: 'Completado', icon: CheckCircle, color: 'text-green-600 bg-[var(--sidebar-bg)]' },
@@ -125,6 +243,7 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
   const [docType, setDocType] = useState('OTRO')
   const [docName, setDocName] = useState('')
   const [selectedNeeded, setSelectedNeeded] = useState(null)
+  const [expandedDoc, setExpandedDoc] = useState(null)
 
   const { data: documents, isLoading: docLoading } = useQuery({
     queryKey: ['documents', expedientId],
@@ -354,76 +473,94 @@ export default function DocumentPanel({ expedientId, currentPhase, operationType
                   const Icon = cfg.icon
 
                   return (
-                    <div key={doc.id} className="flex items-center gap-3 px-5 py-3 hover:bg-[var(--bg-color)]/30 transition-colors">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.color}`}>
-                        <Icon size={16} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[var(--text-main)] truncate">{doc.name}</p>
-                        <div className="flex items-center gap-3 mt-0.5">
-                          <span className={`text-[10px] font-bold ${cfg.color.split(' ')[0]}`}>{cfg.label}</span>
-                          <span className="text-[10px] text-gray-400 capitalize">{doc.phase.toLowerCase()}</span>
-                          {doc.rejectedReason && (
-                            <span className="text-[10px] text-red-500 font-medium">Motivo: {doc.rejectedReason}</span>
+                    <div key={doc.id} className="px-5 py-3 hover:bg-[var(--bg-color)]/30 transition-colors">
+                      {/* Fila principal */}
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${cfg.color}`}>
+                          <Icon size={16} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-[var(--text-main)] truncate">{doc.name}</p>
+                          <div className="flex items-center gap-3 mt-0.5">
+                            <span className={`text-[10px] font-bold ${cfg.color.split(' ')[0]}`}>{cfg.label}</span>
+                            <span className="text-[10px] text-gray-400 capitalize">{doc.phase.toLowerCase()}</span>
+                            {doc.rejectedReason && (
+                              <span className="text-[10px] text-red-500 font-medium">Motivo: {doc.rejectedReason}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {/* Historial de validaciones */}
+                          <button
+                            onClick={() => setExpandedDoc(expandedDoc === doc.id ? null : doc.id)}
+                            className={`p-1.5 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all ${expandedDoc === doc.id ? 'text-[var(--primary-color)]' : 'text-gray-400 hover:text-[var(--primary-color)]'}`}
+                            title="Historial de validaciones"
+                          >
+                            <History size={15} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              const token = localStorage.getItem('crm_token');
+                              window.open(`/api/documents/${doc.id}/preview?token=${token}`, '_blank');
+                            }}
+                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
+                            title="Ver documento"
+                          >
+                            <Eye size={15} />
+                          </button>
+                          {doc.driveUrl && (
+                            <a href={doc.driveUrl} target="_blank" rel="noreferrer"
+                              className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
+                              title="Ver en Google Drive"
+                            >
+                              <ExternalLink size={15} />
+                            </a>
                           )}
+                          <a
+                            href={`/api/documents/${doc.id}/download?token=${localStorage.getItem('crm_token')}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
+                            title="Descargar"
+                          >
+                            <Download size={15} />
+                          </a>
+                          {doc.status === 'SUBIDO' && (
+                            <>
+                              <button onClick={() => validateMutation.mutate(doc.id)}
+                                className="p-1.5 text-gray-400 hover:text-green-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
+                                title="Validar"
+                              >
+                                <CheckCircle size={15} />
+                              </button>
+                              <button onClick={() => {
+                                const reason = prompt('Motivo del rechazo:')
+                                if (reason) rejectMutation.mutate({ docId: doc.id, reason })
+                              }}
+                                className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
+                                title="Rechazar"
+                              >
+                                <XCircle size={15} />
+                              </button>
+                            </>
+                          )}
+                          <button onClick={() => {
+                            if (confirm('¿Eliminar este documento?')) deleteMutation.mutate(doc.id)
+                          }}
+                            className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
+                            title="Eliminar"
+                          >
+                            <Trash2 size={15} />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button 
-                          onClick={() => {
-                            const token = localStorage.getItem('crm_token');
-                            window.open(`/api/documents/${doc.id}/preview?token=${token}`, '_blank');
-                          }}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
-                          title="Ver documento"
-                        >
-                          <Eye size={15} />
-                        </button>
-                        {doc.driveUrl && (
-                          <a href={doc.driveUrl} target="_blank" rel="noreferrer"
-                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
-                            title="Ver en Google Drive"
-                          >
-                            <ExternalLink size={15} />
-                          </a>
-                        )}
-                        <a 
-                          href={`/api/documents/${doc.id}/download?token=${localStorage.getItem('crm_token')}`} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
-                          title="Descargar"
-                        >
-                          <Download size={15} />
-                        </a>
-                        {doc.status === 'SUBIDO' && (
-                          <>
-                            <button onClick={() => validateMutation.mutate(doc.id)}
-                              className="p-1.5 text-gray-400 hover:text-green-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
-                              title="Validar"
-                            >
-                              <CheckCircle size={15} />
-                            </button>
-                            <button onClick={() => {
-                              const reason = prompt('Motivo del rechazo:')
-                              if (reason) rejectMutation.mutate({ docId: doc.id, reason })
-                            }}
-                              className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
-                              title="Rechazar"
-                            >
-                              <XCircle size={15} />
-                            </button>
-                          </>
-                        )}
-                        <button onClick={() => {
-                          if (confirm('¿Eliminar este documento?')) deleteMutation.mutate(doc.id)
-                        }}
-                          className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-[var(--sidebar-bg)] transition-all"
-                          title="Eliminar"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
+                      {/* Panel de historial de validaciones */}
+                      {expandedDoc === doc.id && (
+                        <DocumentValidationHistory
+                          docId={doc.id}
+                          onClose={() => setExpandedDoc(null)}
+                        />
+                      )}
                     </div>
                   )
                 })}

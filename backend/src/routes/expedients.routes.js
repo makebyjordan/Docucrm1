@@ -33,4 +33,10 @@ router.delete('/:id/buyers/:buyerId', ctrl.removeBuyer);
 // Historial
 router.get('/:id/history', ctrl.getPhaseHistory);
 
+// Expedientes vinculados
+router.get('/:id/linked', ctrl.getLinkedExpedients);
+router.post('/:id/link', ctrl.linkExpedient);
+router.delete('/:id/link/:childId', ctrl.unlinkExpedient);
+router.patch('/:id/role', ctrl.setExpedientRole);
+
 module.exports = router;

@@ -15,5 +15,8 @@ router.use('/calendar', require('./calendar.routes'));
 router.use('/visits', authenticate, require('./visits.routes'));
 router.use('/participants', authenticate, require('./expedientClients.routes'));
 router.use('/base-documents', authenticate, require('./baseDocuments.routes'));
+router.use('/document-validations', authenticate, require('./documentValidations.routes'));
+router.use('/expedients', authenticate, require('./expedientLinks.routes'));
+router.use('/client-journey', authenticate, require('./clientJourney.routes'));
 
 module.exports = router;

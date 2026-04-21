@@ -6,18 +6,33 @@ import {
   ArrowLeft, ArrowRight, CheckCircle, XCircle, AlertTriangle,
   FolderOpen, FileText, Bell, Users, History, RefreshCw,
   Pencil, Save, X, Plus, Edit2, Trash2,
+  LayoutDashboard, Clock, Link2, Calculator,
 } from 'lucide-react'
 import api from '../api/client'
 import ChecklistPanel from '../components/Checklist/ChecklistPanel'
 import DocumentPanel from '../components/Documents/DocumentPanel'
 import WorkflowStepper from '../components/Workflow/WorkflowStepper'
 import NotificationLog from '../components/Notifications/NotificationLog'
+import OperationDashboard from '../components/Expedients/OperationDashboard'
+import AlertsPanel from '../components/Expedients/AlertsPanel'
+import OperationTimeline from '../components/Expedients/OperationTimeline'
+import LinkedExpedientsPanel from '../components/Expedients/LinkedExpedientsPanel'
+import FinancialSimulator from '../components/Expedients/FinancialSimulator'
+import CombinedFinancialCalculator from '../components/Expedients/CombinedFinancialCalculator'
+import ClientJourneyPanel from '../components/Expedients/ClientJourneyPanel'
 
 const TABS = [
+  { id: 'dashboard', label: 'Estado', icon: LayoutDashboard },
   { id: 'checklist', label: 'Checklist', icon: CheckCircle },
   { id: 'overview', label: 'Resumen', icon: FolderOpen },
   { id: 'visits', label: 'Visitas', icon: Users },
   { id: 'documents', label: 'Documentos', icon: FileText },
+  { id: 'alerts', label: 'Alertas', icon: AlertTriangle },
+  { id: 'timeline', label: 'Timeline', icon: Clock },
+  { id: 'linked', label: 'Vinculados', icon: Link2 },
+  { id: 'financial', label: 'Financiero', icon: Calculator },
+  { id: 'combined', label: 'Calc. Combinada', icon: Calculator },
+  { id: 'journey', label: 'Historial Cliente', icon: Users },
   { id: 'notifications', label: 'Notificaciones', icon: Bell },
   { id: 'history', label: 'Historial', icon: History },
 ]
@@ -96,7 +111,7 @@ export default function ExpedientDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const qc = useQueryClient()
-  const [tab, setTab] = useState('checklist')
+  const [tab, setTab] = useState('dashboard')
   const [advanceModal, setAdvanceModal] = useState(false)
   const [decision, setDecision] = useState('SI')
   const [notes, setNotes] = useState('')
@@ -284,12 +299,19 @@ export default function ExpedientDetailPage() {
 
       {/* Tab content */}
       <div>
-        {tab === 'overview' && <ExpedientOverview exp={exp} renewMutation={renewMutation} />}
-        {tab === 'visits' && <VisitsPanel expedientId={id} />}
-        {tab === 'checklist' && <ChecklistPanel expedientId={id} />}
-        {tab === 'documents' && <DocumentPanel expedientId={id} currentPhase={exp.currentPhase} operationType={exp.operationType} />}
+        {tab === 'dashboard'     && <OperationDashboard exp={exp} />}
+        {tab === 'overview'      && <ExpedientOverview exp={exp} renewMutation={renewMutation} />}
+        {tab === 'visits'        && <VisitsPanel expedientId={id} />}
+        {tab === 'checklist'     && <ChecklistPanel expedientId={id} />}
+        {tab === 'documents'     && <DocumentPanel expedientId={id} currentPhase={exp.currentPhase} operationType={exp.operationType} />}
+        {tab === 'alerts'        && <AlertsPanel exp={exp} expedientId={id} />}
+        {tab === 'timeline'      && <OperationTimeline exp={exp} />}
+        {tab === 'linked'        && <LinkedExpedientsPanel expedientId={id} />}
+        {tab === 'financial'     && <FinancialSimulator exp={exp} />}
+        {tab === 'combined'      && <CombinedFinancialCalculator exp={exp} />}
+        {tab === 'journey'       && <ClientJourneyPanel clientId={exp.clientId} currentExpedientId={id} />}
         {tab === 'notifications' && <NotificationLog expedientId={id} />}
-        {tab === 'history' && <PhaseHistoryTab history={exp.phaseHistory} operationType={exp.operationType} />}
+        {tab === 'history'       && <PhaseHistoryTab history={exp.phaseHistory} operationType={exp.operationType} />}
       </div>
 
       {showParticipantModal && (
@@ -441,8 +463,6 @@ function ExpedientOverview({ exp, renewMutation }) {
       propertyRooms: inmuebleForm.propertyRooms ? parseInt(inmuebleForm.propertyRooms) : null,
       propertyBaths: inmuebleForm.propertyBaths ? parseInt(inmuebleForm.propertyBaths) : null,
       propertyYear: inmuebleForm.propertyYear ? parseInt(inmuebleForm.propertyYear) : null,
-      propertyPrice: inmuebleForm.propertyPrice ? parseFloat(inmuebleForm.propertyPrice) : null,
-      propertyM2: inmuebleForm.propertyM2 ? parseFloat(inmuebleForm.propertyM2) : null,
       commissionFixed: inmuebleForm.commissionFixed ? parseFloat(inmuebleForm.commissionFixed) : null,
       commissionPercent: inmuebleForm.commissionPercent ? parseFloat(inmuebleForm.commissionPercent) : null,
       arrasAmount: inmuebleForm.arrasAmount ? parseFloat(inmuebleForm.arrasAmount) : null,

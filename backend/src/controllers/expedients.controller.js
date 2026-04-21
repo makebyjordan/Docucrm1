@@ -350,6 +350,80 @@ async function getPhaseHistory(req, res) {
   res.json(history);
 }
 
+// ─── Expedientes vinculados ───────────────────────────────────────────────────
+async function getLinkedExpedients(req, res) {
+  const { id } = req.params;
+
+  const expedient = await prisma.expedient.findUnique({
+    where: { id },
+    select: { parentExpedientId: true },
+  });
+  if (!expedient) return res.status(404).json({ error: 'Expediente no encontrado' });
+
+  const [children, parent] = await Promise.all([
+    prisma.expedient.findMany({
+      where: { parentExpedientId: id },
+      include: {
+        client: { select: { id: true, firstName: true, lastName: true, companyName: true } },
+        assignments: { include: { user: { select: { id: true, name: true, role: true } } } },
+        _count: { select: { documents: true, checklists: true } },
+      },
+    }),
+    expedient.parentExpedientId
+      ? prisma.expedient.findUnique({
+          where: { id: expedient.parentExpedientId },
+          include: {
+            client: { select: { id: true, firstName: true, lastName: true, companyName: true } },
+            assignments: { include: { user: { select: { id: true, name: true, role: true } } } },
+          },
+        })
+      : null,
+  ]);
+
+  res.json({ parent, children });
+}
+
+async function linkExpedient(req, res) {
+  const { id } = req.params;
+  const { childId, expedientRole } = req.body;
+
+  if (!childId) return res.status(400).json({ error: 'childId es requerido' });
+
+  const updated = await prisma.expedient.update({
+    where: { id: childId },
+    data: {
+      parentExpedientId: id,
+      ...(expedientRole && { expedientRole }),
+    },
+    include: { client: true },
+  });
+
+  res.json(updated);
+}
+
+async function unlinkExpedient(req, res) {
+  const { childId } = req.params;
+
+  const updated = await prisma.expedient.update({
+    where: { id: childId },
+    data: { parentExpedientId: null },
+  });
+
+  res.json(updated);
+}
+
+async function setExpedientRole(req, res) {
+  const { id } = req.params;
+  const { expedientRole } = req.body;
+
+  const updated = await prisma.expedient.update({
+    where: { id },
+    data: { expedientRole },
+  });
+
+  res.json(updated);
+}
+
 module.exports = {
   list, kanban, getById, create, update, remove,
   advancePhase, blockExpedient, unblockExpedient, closeExpedient,
@@ -357,4 +431,5 @@ module.exports = {
   getAssignments, setAssignment, removeAssignment,
   getBuyers, addBuyer, updateBuyer, removeBuyer,
   getPhaseHistory,
+  getLinkedExpedients, linkExpedient, unlinkExpedient, setExpedientRole,
 };
